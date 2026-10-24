@@ -10,9 +10,11 @@ Testovací port pro single player z [cybensis/SPT-VR](https://github.com/cybensi
 
 Balíčky jsou ve složce `releases/4.1.6-test`, včetně SHA256 součtů a přehledu kompatibility.
 
-Aktuální oprava **1.3.2.416** řeší pád nativního JSON inicializátoru při hledání typů v DLL. Starší sestavení obsahovala pevné odkazy na volitelné mody, například `KmyTarkovConfiguration`, které při jejich absenci způsobily `TypeLoadException`. Výchozí DLL nyní obsahuje základní VR port bez integrací EFT API, AmandsGraphics, DynamicMaps a WeaponCustomizer. Jejich zdroje zůstávají v repozitáři pro oddělený port.
+Aktuální oprava **1.3.3.416** řeší přechod z výběru postavy do hlavního menu. VR nastavení menu se provádí po dokončení nativního `Init`/obnovení prostředí, se zachováním kontextu Unity. Chybějící ruce, ukazatel a části rigu se podle potřeby obnoví. Menu a jeho UI kamera mají zapnuté obě oči a canvasy používají aktuální kameru. Ovladače používají existující akce `LeftHandPose`/`RightHandPose` a tlačítka A/X.
 
-Oprava JSON z 1.3.1.416 zůstává: před XR ověří načtení skutečných počtů předmětů a textový formát strany v požadavku na raid. Nový regresní test načítá **celou sestavenou DLL** s blokovanými volitelnými závislostmi a potom spouští skutečný nativní JSON inicializátor. Pokud už máte předchozí testovací ZIP, aktualizujte jen DLL podle [TESTING.md](TESTING.md). Nová verze ještě vyžaduje opakovaný test ve hře.
+Oprava 1.3.2.416 odstranila pád nativního JSON inicializátoru na pevných odkazech na volitelné mody. Výchozí DLL obsahuje základní VR port bez integrací EFT API, AmandsGraphics, DynamicMaps a WeaponCustomizer. Jejich zdroje zůstávají v repozitáři pro oddělený port.
+
+Oprava JSON z 1.3.1.416 zůstává: před XR ověří načtení skutečných počtů předmětů a textový formát strany v požadavku na raid. Regresní test načítá **celou sestavenou DLL** s blokovanými volitelnými závislostmi a potom spouští skutečný nativní JSON inicializátor. Další test ověřuje načasování menu a zachování synchronizačního kontextu. Pokud už máte předchozí testovací ZIP, aktualizujte jen DLL podle [TESTING.md](TESTING.md). Nová verze ještě vyžaduje opakovaný test ve hře.
 
 ## Stav a optika
 

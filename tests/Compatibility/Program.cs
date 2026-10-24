@@ -114,6 +114,21 @@ var jsonStartup=startupCalls.FindIndex(m=>m.DeclaringType.FullName=="TarkovVR.So
 var vrStartup=startupCalls.FindIndex(m=>m.DeclaringType.FullName==plugin.FullName && m.Name=="InitializeVR");
 if(jsonStartup<0 || vrStartup<0 || jsonStartup>=vrStartup) failures.Add(new{problem="Game JSON defaults must be initialized and checked before XR"});
 if(!types.TryGetValue("Newtonsoft.Json.UnityConverters.UnityConverterInitializer",out var jsonInitializer) || !jsonInitializer.Methods.Any(m=>m.Name=="Init" && m.IsStatic && m.Parameters.Count==0)) failures.Add(new{problem="Native Unity JSON initializer is unavailable"});
+var menu=mod.MainModule.Types.Single(t=>t.FullName=="TarkovVR.Patches.Misc.MenuPatches");
+foreach(var name in new[]{"AddAndFixMenuVRCam","PositionMenuPropsAfterRefresh"}) {
+    var method=menu.Methods.Single(m=>m.Name==name);
+    if(!method.Parameters.Any(p=>p.Name=="__result" && p.ParameterType.FullName=="System.Threading.Tasks.Task&") || !method.Body.Instructions.Any(i=>i.Operand is MethodReference m && m.DeclaringType.Name=="NativeTaskContinuation" && m.Name=="AfterCompletion")) failures.Add(new{problem="VR menu setup must await the native task",method=name});
+}
+var menuSetup=menu.Methods.Single(m=>m.Name=="InitializeMainMenuVR").Body.Instructions.ToList();
+int environmentAssignment=menuSetup.FindIndex(i=>i.OpCode.Code==Mono.Cecil.Cil.Code.Stsfld && i.Operand is FieldReference f && f.Name=="environmentUi");
+int cameraSetup=menuSetup.FindIndex(i=>i.Operand is MethodReference m && m.Name=="FixMainMenuCamera");
+if(environmentAssignment<0 || cameraSetup<0 || environmentAssignment>=cameraSetup) failures.Add(new{problem="Assign the current environment before configuring the menu camera"});
+if(!menu.Methods.Single(m=>m.Name=="EnsureMenuRig").Body.Instructions.Any(i=>i.Operand is MethodReference m && m.Name=="SpawnHands")) failures.Add(new{problem="The menu rig must restore missing controller objects"});
+if(menu.Methods.Single(m=>m.Name=="FixMainMenuCamera").Body.Instructions.Count(i=>i.Operand is MethodReference m && m.Name=="set_stereoTargetEye")<2) failures.Add(new{problem="Menu and UI cameras must both target the headset"});
+var manager=mod.MainModule.Types.Single(t=>t.FullName=="TarkovVR.Source.Player.VRManager.MenuVRManager");
+foreach(var name in new[]{"OnDisable","OnDestroy"}) {
+    if(!manager.Methods.Single(m=>m.Name==name).Body.Instructions.Any(i=>i.Operand is MethodReference m && m.Name=="RemovePoseListeners")) failures.Add(new{problem="Menu controller listeners must be detached during teardown",method=name});
+}
 var weapon = mod.MainModule.Types.First(t=>t.FullName=="TarkovVR.Patches.Core.Player.WeaponPatches");
 foreach(var name in new[]{"AlignHeadsetReticle","ApplyHeadsetOpticLimits"}) {
     var method=weapon.Methods.FirstOrDefault(m=>m.Name==name);

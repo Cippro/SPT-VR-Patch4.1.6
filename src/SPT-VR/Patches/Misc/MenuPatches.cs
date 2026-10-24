@@ -51,6 +51,7 @@ using Comfort.Common;
 using TarkovVR.Patches.Core.Player;
 using GPUInstancer;
 using TarkovVR.Source.Misc;
+using TarkovVR.Source.Compatibility;
 
 namespace TarkovVR.Patches.Misc
 {
@@ -138,27 +139,32 @@ namespace TarkovVR.Patches.Misc
         //}
         [HarmonyPostfix]
         [HarmonyPatch(typeof(EFT.MainMenuShowOperation), "Init")]
-        private static void AddAndFixMenuVRCam(EFT.MainMenuShowOperation __instance)
+        private static void AddAndFixMenuVRCam(EFT.MainMenuShowOperation __instance, ref Task __result)
         {
-            UnityEngine.Cursor.lockState = CursorLockMode.Locked;
-            if (__instance.environmentUI_0 && __instance.environmentUI_0._currentEnvironment)
+            __result = NativeTaskContinuation.AfterCompletion(__result, () => InitializeMainMenuVR(__instance));
+        }
+
+        private static void InitializeMainMenuVR(EFT.MainMenuShowOperation operation)
+        {
+            try
             {
+                UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+                environmentUi = operation.environmentUI_0;
+                VRGlobals.commonUi = operation.commonUI_0.transform;
+                VRGlobals.preloaderUi = operation.preloaderUI_0.transform;
+                VRGlobals.menuUi = operation.menuUI_0.transform;
+                VRGlobals.inGame = false;
+                VRGlobals.menuOpen = true;
+                EnsureMenuRig();
+                VRGlobals.menuVRManager.enabled = true;
                 FixMainMenuCamera();
+                PositionMainMenuUi();
+                Plugin.MyLog.LogInfo("[MenuVR] Main menu UI initialized after native Init completed.");
             }
-
-            VRGlobals.commonUi = __instance.commonUI_0.transform;
-            //__instance.commonUI_0.transform.GetChild(0).RectTransform().sizeDelta = new Vector2(2560, 1440);
-            VRGlobals.preloaderUi = __instance.preloaderUI_0.transform;
-            //__instance.preloaderUI_0.transform.GetChild(0).RectTransform().sizeDelta = new Vector2(2560, 1440);
-            VRGlobals.menuUi = __instance.menuUI_0.transform;
-            //__instance.menuUI_0.transform.GetChild(0).RectTransform().sizeDelta = new Vector2(2560, 1440);
-            environmentUi = __instance.environmentUI_0;
-            if (VRGlobals.menuVRManager)
+            catch (Exception ex)
             {
-                VRGlobals.menuVRManager.RightHand.transform.parent = VRGlobals.vrOffsetter.transform;
+                Plugin.MyLog.LogError($"[MenuVR] Main menu VR setup failed: {ex}");
             }
-
-            PositionMainMenuUi();
         }
 
         public static void PositionMainMenuUi()
@@ -180,6 +186,7 @@ namespace TarkovVR.Patches.Misc
                 PreloaderUI.DontDestroyOnLoad(VRGlobals.menuUi.gameObject);
                 VRGlobals.menuUi.transform.eulerAngles = Vector3.zero;
                 otherMenuCanvas.renderMode = RenderMode.WorldSpace;
+                otherMenuCanvas.worldCamera = menuCamera;
                 VRGlobals.menuUi.transform.localScale = new Vector3(0.0015f, 0.0015f, 0.0015f);
                 VRGlobals.menuUi.transform.position = new Vector3(0f, -999.9333f, 1);
                 otherMenuCanvas.transform.localScale = new Vector3(1, 1, 1);
@@ -189,7 +196,7 @@ namespace TarkovVR.Patches.Misc
 
         private static void PositionPreloaderUi()
         {
-            if (VRGlobals.preloaderUi.transform.childCount > 0)
+            if (VRGlobals.preloaderUi && VRGlobals.preloaderUi.transform.childCount > 0)
             {
                 Canvas overlayCanvas = VRGlobals.preloaderUi.GetChild(0).GetComponent<Canvas>();
                 if (overlayCanvas)
@@ -198,6 +205,7 @@ namespace TarkovVR.Patches.Misc
                     PreloaderUI.DontDestroyOnLoad(VRGlobals.preloaderUi.gameObject);
                     VRGlobals.preloaderUi.transform.eulerAngles = Vector3.zero;
                     overlayCanvas.renderMode = RenderMode.WorldSpace;
+                    overlayCanvas.worldCamera = menuCamera;
                     VRGlobals.preloaderUi.transform.localScale = new Vector3(0.0015f, 0.0015f, 0.0015f);
                     VRGlobals.preloaderUi.transform.position = new Vector3(0f, -999.9333f, 1);
                     overlayCanvas.transform.localScale = new Vector3(1, 1, 1);
@@ -208,12 +216,17 @@ namespace TarkovVR.Patches.Misc
 
         private static void PositionCommonUi()
         {
+            if (!VRGlobals.commonUi || VRGlobals.commonUi.childCount == 0)
+                return;
             Transform menuUIObject = VRGlobals.commonUi.transform.GetChild(0);
             if (menuUIObject)
             {
                 Canvas menuUICanvas = menuUIObject.GetComponent<Canvas>();
+                if (!menuUICanvas)
+                    return;
                 menuUICanvas.enabled = true;
                 menuUICanvas.renderMode = RenderMode.WorldSpace;
+                menuUICanvas.worldCamera = menuCamera;
                 menuUICanvas.additionalShaderChannels = AdditionalCanvasShaderChannels.TexCoord1 | AdditionalCanvasShaderChannels.Normal | AdditionalCanvasShaderChannels.Tangent;
                 menuUICanvas.RectTransform().localScale = new Vector3(1.3333f, 1.3333f, 1.3333f);
                 menuUICanvas.RectTransform().anchoredPosition = new Vector3(1280, 720, 0);
@@ -265,59 +278,90 @@ namespace TarkovVR.Patches.Misc
         }
 
         private static Quaternion camHolderRot;
+        private static Camera menuCamera;
+
+        private static void EnsureMenuRig()
+        {
+            if (!VRGlobals.camRoot)
+                VRGlobals.camRoot = new GameObject("camRoot");
+            if (!VRGlobals.vrOffsetter)
+                VRGlobals.vrOffsetter = new GameObject("vrOffsetter");
+            if (VRGlobals.vrOffsetter.transform.parent != VRGlobals.camRoot.transform)
+                VRGlobals.vrOffsetter.transform.SetParent(VRGlobals.camRoot.transform, false);
+            if (!VRGlobals.camHolder)
+                VRGlobals.camHolder = new GameObject("camHolder");
+            if (VRGlobals.camHolder.transform.parent != VRGlobals.vrOffsetter.transform)
+                VRGlobals.camHolder.transform.SetParent(VRGlobals.vrOffsetter.transform, false);
+            if (!VRGlobals.menuVRManager)
+                VRGlobals.menuVRManager = VRGlobals.camHolder.GetComponent<MenuVRManager>()
+                    ?? VRGlobals.camHolder.AddComponent<MenuVRManager>();
+
+            // The character-selection camera may have owned and destroyed a hand.
+            // Restore each controller independently, even when the manager survived.
+            VRGlobals.menuVRManager.SpawnHands();
+        }
+
         public static void FixMainMenuCamera()
         {
-            if (environmentUi)
+            if (!environmentUi || !environmentUi._currentEnvironment)
+                return;
+            Transform cameraRoot = environmentUi._currentEnvironment.CameraContainer;
+            if (!cameraRoot)
+                return;
+            Camera mainMenuCam = cameraRoot.GetComponentsInChildren<Camera>(true)
+                .FirstOrDefault(camera => camera.name != "uiCam");
+            if (!mainMenuCam)
             {
-                Transform camContainer = environmentUi._currentEnvironment.CameraContainer.GetChild(0);
-                if (!camContainer.gameObject.GetComponent<SteamVR_TrackedObject>())
-                    camContainer.gameObject.AddComponent<SteamVR_TrackedObject>();
-                //camContainer.GetComponent<PostProcessLayer>().m_Camera = environmentUi._alignmentCamera;
-                Camera mainMenuCam = camContainer.GetComponent<Camera>();
-                Vector3 newCamHolderPos = mainMenuCam.transform.localPosition * -1;
+                Plugin.MyLog.LogWarning("[MenuVR] Environment camera is not ready yet.");
+                return;
+            }
+
+            EnsureMenuRig();
+            bool cameraChanged = menuCamera != mainMenuCam;
+            menuCamera = mainMenuCam;
+            Transform camContainer = mainMenuCam.transform;
+            if (!camContainer.GetComponent<SteamVR_TrackedObject>())
+                camContainer.gameObject.AddComponent<SteamVR_TrackedObject>();
+            if (cameraChanged)
+            {
+                Vector3 newCamHolderPos = camContainer.localPosition * -1;
                 newCamHolderPos.y += 0.1f;
                 newCamHolderPos.z = -0.6f;
-                camContainer.transform.parent.localPosition = newCamHolderPos;
+                cameraRoot.localPosition = newCamHolderPos;
+                camHolderRot = Quaternion.Euler(0, -camContainer.localEulerAngles.y, 0);
+                cameraRoot.localRotation = camHolderRot;
                 camContainer.localRotation = Quaternion.identity;
-                camHolderRot = Quaternion.Euler(0, mainMenuCam.transform.localEulerAngles.y * -1, 0);
-                camContainer.transform.parent.localRotation = camHolderRot;
-                camContainer.tag = "MainCamera";
-                if (mainMenuCam)
-                {
-                    if (!camContainer.Find("uiCam"))
-                    {
-                        GameObject uiCamHolder = new GameObject("uiCam");
-                        uiCamHolder.transform.parent = camContainer.transform;
-                        uiCamHolder.transform.localRotation = Quaternion.identity;
-                        uiCamHolder.transform.localPosition = Vector3.zero;
-                        Camera uiCam = uiCamHolder.AddComponent<Camera>();
-                        uiCam.depth = 12;
-                        uiCam.nearClipPlane = VRGlobals.NEAR_CLIP_PLANE;
-                        uiCam.cullingMask = 32;
-                        uiCam.clearFlags = CameraClearFlags.Depth;
-                    }
-
-                    //mainMenuCam.cullingMask = -1;
-                    mainMenuCam.RemoveAllCommandBuffers();
-                }
-
-                camContainer.GetComponent<PhysicsSimulator>().enabled = false;
-                camContainer.GetComponent<CameraMotionBlur>().enabled = false;
-                if (VRGlobals.camRoot == null)
-                {
-                    //Plugin.MyLog.LogWarning("\n\n CharacterControllerSpawner Spawn " + __instance.gameObject + "\n");                   
-                    VRGlobals.camHolder = new GameObject("camHolder");
-                    VRGlobals.vrOffsetter = new GameObject("vrOffsetter");
-                    VRGlobals.camRoot = new GameObject("camRoot");
-                    VRGlobals.camHolder.transform.parent = VRGlobals.vrOffsetter.transform;
-                    VRGlobals.vrOffsetter.transform.parent = VRGlobals.camRoot.transform;
-                    VRGlobals.vrOffsetter.transform.localRotation = camHolderRot;
-                    VRGlobals.menuVRManager = VRGlobals.camHolder.AddComponent<MenuVRManager>();
-                }
-
-                VRGlobals.camRoot.transform.position = camContainer.transform.parent.position;
-                PositionMenuEnvironmentProps();
+                mainMenuCam.RemoveAllCommandBuffers();
             }
+            camContainer.tag = "MainCamera";
+            mainMenuCam.stereoTargetEye = StereoTargetEyeMask.Both;
+            mainMenuCam.nearClipPlane = VRGlobals.NEAR_CLIP_PLANE;
+            Transform existingUiCam = camContainer.Find("uiCam");
+            Camera uiCam;
+            if (!existingUiCam)
+            {
+                GameObject uiCamHolder = new GameObject("uiCam");
+                uiCamHolder.transform.SetParent(camContainer, false);
+                uiCam = uiCamHolder.AddComponent<Camera>();
+            }
+            else
+            {
+                uiCam = existingUiCam.GetComponent<Camera>() ?? existingUiCam.gameObject.AddComponent<Camera>();
+            }
+            uiCam.depth = 12;
+            uiCam.nearClipPlane = VRGlobals.NEAR_CLIP_PLANE;
+            uiCam.cullingMask = 1 << 5;
+            uiCam.clearFlags = CameraClearFlags.Depth;
+            uiCam.stereoTargetEye = StereoTargetEyeMask.Both;
+            var simulator = camContainer.GetComponent<PhysicsSimulator>();
+            if (simulator) simulator.enabled = false;
+            var motionBlur = camContainer.GetComponent<CameraMotionBlur>();
+            if (motionBlur) motionBlur.enabled = false;
+            VRGlobals.vrOffsetter.transform.localRotation = camHolderRot;
+            VRGlobals.camRoot.transform.position = cameraRoot.position;
+            PositionMenuEnvironmentProps();
+            if (cameraChanged)
+                Plugin.MyLog.LogInfo($"[MenuVR] Camera '{mainMenuCam.name}' configured for both eyes; controller rig restored.");
         }
 
         [HarmonyPostfix]
@@ -340,20 +384,27 @@ namespace TarkovVR.Patches.Misc
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(EnvironmentUI), "RefreshEnvironmentAsync")]
-        public static void PositionMenuPropsAfterRefresh(Task __result)
+        public static void PositionMenuPropsAfterRefresh(EnvironmentUI __instance, ref Task __result)
         {
-            __result.ContinueWith(task =>
+            __result = NativeTaskContinuation.AfterCompletion(__result, () =>
             {
-                if (task.IsCompleted)
+                try
                 {
+                    environmentUi = __instance;
+                    FixMainMenuCamera();
+                    PositionMainMenuUi();
                     PositionMenuEnvironmentProps();
                 }
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+                catch (Exception ex)
+                {
+                    Plugin.MyLog.LogError($"[MenuVR] Environment refresh VR setup failed: {ex}");
+                }
+            });
         }
 
         public static void PositionMenuEnvironmentProps()
         {
-            if (environmentUi && environmentUi._currentEnvironment.ScreenAnchors.Length > 0)
+            if (environmentUi && environmentUi._currentEnvironment && environmentUi._currentEnvironment.ScreenAnchors != null && environmentUi._currentEnvironment.ScreenAnchors.Length > 0 && environmentUi._currentEnvironment.ScreenAnchors[0])
             {
                 Transform envProp = environmentUi._currentEnvironment.ScreenAnchors[0].transform;
                 //Plugin.MyLog.LogInfo("Position Environment Props: " + envProp);
@@ -427,7 +478,7 @@ namespace TarkovVR.Patches.Misc
         [HarmonyPatch(typeof(EnvironmentUIRoot), "Init")]
         private static void RepositionEnvironmentAfterChange(EnvironmentUIRoot __instance, Camera alignmentCamera, IReadOnlyCollection<EEventType> events, bool isMain)
         {
-            if (environmentUi = __instance.transform.parent.GetComponent<EnvironmentUI>())
+            if (environmentUi = __instance.GetComponentInParent<EnvironmentUI>())
             {
                 FixMainMenuCamera();
             }

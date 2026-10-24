@@ -108,6 +108,7 @@ class Program
         }
         finally { JsonConvert.DefaultSettings = original; }
         Console.WriteLine($"JSON regression: {assertions} assertions passed using supplied SPT 4.1.6 assemblies.");
+        MenuTaskRegression.Run(plugin);
     }
 
     static string InitializeBootstrap()

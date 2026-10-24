@@ -81,21 +81,29 @@ namespace TarkovVR.Source.Player.VRManager
         */
         public void OnDisable()
         {
-            if (!pointer || !pointer.holder)
-                return;
-            pointer.enabled = false;
-            pointer.holder.active = false;
+            RemovePoseListeners();
+            if (pointer)
+            {
+                pointer.enabled = false;
+                if (pointer.holder) pointer.holder.SetActive(false);
+            }
             if (MenuPatches.vrUiInteracter)
                 MenuPatches.vrUiInteracter.enabled = false;
+        }
+
+        public void OnDestroy()
+        {
             RemovePoseListeners();
         }
 
         public void OnEnable()
         {
-            if (!pointer || !pointer.holder)
-                return;
-            pointer.enabled = true;
-            pointer.holder.active = true;
+            SpawnHands();
+            if (pointer)
+            {
+                pointer.enabled = true;
+                if (pointer.holder) pointer.holder.SetActive(true);
+            }
             if (MenuPatches.vrUiInteracter)
                 MenuPatches.vrUiInteracter.enabled = true;
             AddPoseListeners();
@@ -126,18 +134,12 @@ namespace TarkovVR.Source.Player.VRManager
 
         public void LeftHandedMode()
         {
-            SteamVR_Actions._default.RightHandPose.RemoveOnUpdateListener(SteamVR_Input_Sources.RightHand, UpdateRightHand);
-            SteamVR_Actions._default.LeftHandPose.RemoveOnUpdateListener(SteamVR_Input_Sources.LeftHand, UpdateLeftHand);
-            SteamVR_Actions._default.LeftHandPose.AddOnUpdateListener(SteamVR_Input_Sources.LeftHand, UpdateRightHand);
-            SteamVR_Actions._default.RightHandPose.AddOnUpdateListener(SteamVR_Input_Sources.RightHand, UpdateLeftHand);
+            SpawnHands();
         }
 
         public void RightHandedMode()
         {
-            SteamVR_Actions._default.RightHandPose.RemoveOnUpdateListener(SteamVR_Input_Sources.RightHand, UpdateLeftHand);
-            SteamVR_Actions._default.LeftHandPose.RemoveOnUpdateListener(SteamVR_Input_Sources.LeftHand, UpdateRightHand);
-            SteamVR_Actions._default.RightHandPose.AddOnUpdateListener(SteamVR_Input_Sources.RightHand, UpdateRightHand);
-            SteamVR_Actions._default.LeftHandPose.AddOnUpdateListener(SteamVR_Input_Sources.LeftHand, UpdateLeftHand);
+            SpawnHands();
         }
 
         //private void Update()
@@ -184,23 +186,50 @@ namespace TarkovVR.Source.Player.VRManager
 
         public void SpawnHands()
         {
+            if (!VRGlobals.vrOffsetter)
+                return;
             if (!RightHand)
             {
-                RightHand = new GameObject("RightHand");
-                RightHand.AddComponent<SteamVR_Behaviour_Pose>();
-                //RightHand.AddComponent<SteamVR_Skeleton_Poser>();
-                RightHand.transform.parent = VRGlobals.camHolder.transform.parent;
-                MenuPatches.vrUiInteracter = RightHand.AddComponent<VRUIInteracter>();
-                pointer = RightHand.AddComponent<LaserPointer>();
-                pointer.color = Color.cyan;
+                RightHand = CreateMenuHand("RightHand", true);
             }
-
             if (!LeftHand)
             {
-                LeftHand = new GameObject("LeftHand");
-                LeftHand.AddComponent<SteamVR_Behaviour_Pose>();
-                LeftHand.transform.parent = VRGlobals.camHolder.transform.parent;
+                LeftHand = CreateMenuHand("LeftHand", false);
             }
+            RightHand.transform.SetParent(VRGlobals.vrOffsetter.transform, false);
+            LeftHand.transform.SetParent(VRGlobals.vrOffsetter.transform, false);
+            ConfigureMenuPose(RightHand, true);
+            ConfigureMenuPose(LeftHand, false);
+            MenuPatches.vrUiInteracter = RightHand.GetComponent<VRUIInteracter>() ?? RightHand.AddComponent<VRUIInteracter>();
+            pointer = RightHand.GetComponent<LaserPointer>() ?? RightHand.AddComponent<LaserPointer>();
+            pointer.pose = RightHand.GetComponent<SteamVR_Behaviour_Pose>();
+            pointer.interactWithUI = VRSettings.GetLeftHandedMode() ? SteamVR_Actions._default.ButtonX : SteamVR_Actions._default.ButtonA;
+            pointer.color = Color.cyan;
+            pointer.enabled = isActiveAndEnabled;
+            MenuPatches.vrUiInteracter.enabled = isActiveAndEnabled;
+            if (isActiveAndEnabled) AddPoseListeners();
+        }
+
+        private static GameObject CreateMenuHand(string name, bool primary)
+        {
+            var hand = new GameObject(name);
+            hand.SetActive(false);
+            hand.transform.SetParent(VRGlobals.vrOffsetter.transform, false);
+            hand.AddComponent<SteamVR_Behaviour_Pose>();
+            ConfigureMenuPose(hand, primary);
+            hand.SetActive(true);
+            return hand;
+        }
+
+        private static void ConfigureMenuPose(GameObject hand, bool primary)
+        {
+            var pose = hand.GetComponent<SteamVR_Behaviour_Pose>() ?? hand.AddComponent<SteamVR_Behaviour_Pose>();
+            bool useLeftPose = primary == VRSettings.GetLeftHandedMode();
+            pose.poseAction = useLeftPose ? SteamVR_Actions._default.LeftHandPose : SteamVR_Actions._default.RightHandPose;
+            pose.inputSource = useLeftPose ? SteamVR_Input_Sources.LeftHand : SteamVR_Input_Sources.RightHand;
+            // This manager applies the same poses with VR hand offsets in its listeners.
+            // Keep the behaviour only as the pointer's action/source descriptor.
+            pose.enabled = false;
         }
     }
 }

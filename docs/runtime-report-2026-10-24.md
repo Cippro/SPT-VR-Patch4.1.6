@@ -1,5 +1,32 @@
 # Oprava JSON po prvním testu ve hře
 
+## Aktualizace 1.3.3.416 — přechod z výběru postavy do VR menu
+
+Další log verze 1.3.2.416 potvrzuje `JSON defaults verified`, úspěšnou inicializaci SteamVR s Quest 3 a úspěšný požadavek `/singleplayer/clientmods`. Při vstupu do hlavního menu po výběru postavy pak nastala jiná chyba:
+
+```text
+NullReferenceException
+at UnityEngine.GameObject.get_transform(GameObject)
+at MenuPatches.AddAndFixMenuVRCam(MainMenuShowOperation) [0x00071]
+at MainMenuShowOperation.Init()
+at MainMenuShowOperation.Execute(...)
+at TarkovApplication.MainMenu(...)
+```
+
+IL publikované DLL v tomto bloku čte `menuVRManager.RightHand.transform` a `vrOffsetter.transform`. Nestačilo, že existoval manager: objekty rukou mohly zaniknout s kamerou předchozí obrazovky. Postfix navíc běžel už při návratu `Task` z nativního asynchronního `Init`, před dokončením načítání, a volal nastavení kamery před přiřazením aktuálního prostředí.
+
+Oprava 1.3.3.416:
+
+- Postfixy `MainMenuShowOperation.Init` a `EnvironmentUI.RefreshEnvironmentAsync` vrací obalený task. VR callback proběhne až po úspěšném dokončení původního tasku a zachová jeho synchronizační kontext, chyby i zrušení.
+- Menu nejprve uloží aktuální prostředí a UI reference. `EnsureMenuRig` obnoví chybějící části sestavy a `SpawnHands` nezávisle obnoví chybějící ruce, ukazatel a UI interakci.
+- Kamera prostředí a její UI kamera cílí na obě oči. Canvasy mají aktuální world camera; při obnově prostředí se vazby znovu nastaví. Volitelné komponenty kamery mají kontrolu existence.
+- Menu ruce explicitně používají existující `LeftHandPose`/`RightHandPose`. Jejich transformace nadále řídí VR pose listenery; nevzniká souběžný zápis z výchozí neplatné akce `Pose`. Ukazatel používá tlačítko A/X místo neexistujícího `InteractUI` z logu.
+- Při vypnutí/zániku manageru se pose listenery odpojí i tehdy, když už ukazatel zanikl. Případná chyba VR callbacku se vypíše s `[MenuVR]` a nepřeruší dokončenou nativní inicializaci menu.
+
+Nový test spouští task helper přímo ze sestavené DLL. Deset kontrol ověřuje čekání na nedokončený task, jediné spuštění callbacku, nativní chybu, zrušení, chybu callbacku a návrat na zachycený synchronizační kontext a vlákno. Metadata ověřují obalení tasků, pořadí přiřazení prostředí, obnovu rukou, obě menu kamery a odpojení listenerů. Zůstává 276 základních Harmony cílů, 93 kontrol JSON a žádná volitelná/FIKA závislost; kompletní DLL nyní obsahuje 199 typů.
+
+Geometrii scény, fyzické pohyby ovladačů a zobrazení v headsetu nelze tímto cloudovým testem potvrdit. Je potřeba znovu ověřit výběr postavy, hlavní menu, obě dominantní ruce a následně raid podle `TESTING.md`.
+
 ## Aktualizace 1.3.2.416 — určená příčina pádu při startu
 
 Následující uživatelský `LogOutput.log` potvrdil načtení verze 1.3.1.416 a tento řetězec výjimek před inicializací VR:
