@@ -1,5 +1,16 @@
 # Oprava JSON po prvním testu ve hře
 
+## Aktualizace 1.3.5.416 — stabilizace funkční alfy
+
+Uživatel označil 1.3.4.416 za funkční alfu a požádal o další ladění spolehlivosti a VR přizpůsobení. Bez nového chybového logu byla provedena kontrola životního cyklu UI; nejde o tvrzení, že uživatel níže popsané vady sám reprodukoval.
+
+- Při výpadku `EventSystem.current` se dříve jen vynechal snímek; rozpracovaný stisk/drag se neuklidil. Nyní se ukončí původní interakce a nová čeká na uvolnění potvrzení.
+- Samotný `Reset` nebránil přenosu A/X, pokud se UI zapnulo ve stejném snímku jako `stateDown`. Nový režim blokuje stisk do prvního neutrálního/uvolňovacího snímku.
+- Nativní pointer callback může zavřít nebo znovu otevřít UI. Vlastnictví stisku, dragu a hoveru se uklidí před callbacky a navazující zpracování kontroluje, že stále běží tatáž interakce.
+- Ztráta release edge nyní vyvolá release bez kliku. Duplicitní down nepřeruší již probíhající stisk. Uvolnění triggeru se sleduje i mimo UI.
+
+Nový stavový test nejprve selhal na nezměněné DLL 1.3.4.416: po přechodu do `held=false` bez `stateUp` nedošlo k release (`got 0, expected 2`). Opravená DLL má 40 úspěšných kontrol potvrzovacího stavu, vedle 93 JSON a 10 task kontrol. Zůstává všech 276 základních Harmony cílů a 202 typů pluginu bez volitelných modů. Testy nespouštějí Unity EventSystem ani headset; nový build čeká na ruční ověření opakovaných přechodů. Rozvržení menu, laser a nativní PIP zůstávají podle přijaté alfy. Priority a známé mezery jsou v [alpha-stabilization.md](alpha-stabilization.md).
+
 ## Aktualizace 1.3.4.416 — výška menu, inventář a potvrzení
 
 Uživatel potvrdil funkční hlavní menu a dokončený vstup do Scav raidu s 1.3.3.416. Log obsahuje úspěšné `getRaidTime` i uložení Scav profilu. Zbývající hlášené problémy: menu v úrovni podlahy, zobrazený inventář bez interakce a nežádoucí zelené zesílení paprsku při A. Uživatel upřesnil, že původní verze tento zelený efekt neměla.

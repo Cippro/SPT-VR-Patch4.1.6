@@ -139,6 +139,9 @@ var raycast=interacter.Methods.Single(m=>m.Name=="RaycastFindHit").Body.Instruct
 foreach(var name in new[]{"get_rootCanvas","get_worldCamera","set_pointerCurrentRaycast"}) if(!raycast.Any(i=>i.Operand is MethodReference m && m.Name==name)) failures.Add(new{problem="VR UI raycast must retain native camera and raycast metadata",member=name});
 var confirmHandler=interacter.Methods.Single(m=>m.Name=="HandleConfirm").Body.Instructions;
 foreach(var name in new[]{"set_pointerPressRaycast","set_pointerPress","set_pressPosition"}) if(!confirmHandler.Any(i=>i.Operand is MethodReference m && m.Name==name)) failures.Add(new{problem="VR confirm must retain native pointer press metadata",member=name});
+foreach(var name in new[]{"OnEnable","OnDisable","Update"}) if(!interacter.Methods.Single(m=>m.Name==name).Body.Instructions.Any(i=>i.Operand is MethodReference m && m.Name=="ResetInteraction")) failures.Add(new{problem="UI lifecycle changes must cancel pending interactions",method=name});
+if(!interacter.Methods.Single(m=>m.Name=="ResetInteraction").Body.Instructions.Any(i=>i.Operand is MethodReference m && m.Name=="BlockUntilRelease")) failures.Add(new{problem="Reopened UI must wait for the opening action to be released"});
+if(!confirmHandler.Any(i=>i.Operand is MethodReference m && m.Name=="IsCurrentInteraction")) failures.Add(new{problem="Native UI callbacks must not resume an invalidated press"});
 var pointerUpdate=mod.MainModule.Types.Single(t=>t.FullName=="TarkovVR.Source.Misc.LaserPointer").Methods.Single(m=>m.Name=="Update").Body.Instructions;
 if(pointerUpdate.Any(i=>i.Operand is FieldReference f && f.Name=="clickColor") || pointerUpdate.Any(i=>i.Operand is MethodReference m && m.Name=="GetState")) failures.Add(new{problem="Confirm must not turn the laser green or widen it"});
 var height=mod.MainModule.Types.Single(t=>t.FullName=="TarkovVR.Source.UI.MenuHeightCalibration").Methods.Single(m=>m.Name=="LateUpdate").Body.Instructions;

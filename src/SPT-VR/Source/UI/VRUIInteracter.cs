@@ -37,6 +37,7 @@ namespace TarkovVR.Source.UI
         private bool loggedMissingTarget;
         private bool loggedValidClick;
         private bool dragCanceledUntilRelease;
+        private int interactionRevision;
         public bool rotated;
         public float rightJoyTimeHeld;
         public bool IsDragging => dragObject;
@@ -50,40 +51,72 @@ namespace TarkovVR.Source.UI
         {
             loggedMissingTarget = false;
             loggedValidClick = false;
-            dragCanceledUntilRelease = IsDragPressed();
-            confirm.Reset();
+            ResetInteraction();
         }
 
         private void OnDisable()
         {
-            if (eventData != null)
-            {
-                eventData.button = PointerEventData.InputButton.Left;
-                if (pressedObject) ExecuteEvents.Execute(pressedObject, eventData, ExecuteEvents.pointerUpHandler);
-                if (dragObject) CancelDrag();
-                if (lastHighlightedObject) ExecuteEvents.Execute(lastHighlightedObject, eventData, ExecuteEvents.pointerExitHandler);
-                eventData.pointerPress = null;
-                eventData.rawPointerPress = null;
-                eventData.pointerEnter = null;
-                eventData.eligibleForClick = false;
-            }
-            confirm.Reset();
+            ResetInteraction();
+        }
+
+        private void ResetInteraction()
+        {
+            interactionRevision++;
+            var data = eventData;
+            var releaseTarget = pressedObject;
+            var canceledDrag = data != null && data.dragging ? dragObject : null;
+            var hoverTarget = lastHighlightedObject;
+            // Clear ownership before native callbacks, which can disable or reopen the UI.
             pressedObject = null;
             pressedClickObject = null;
             lastHighlightedObject = null;
             hitObject = null;
             dragObject = null;
+            interactionCamera = null;
+            lastClickObject = null;
+            clickCount = 0;
+            rightJoyTimeHeld = 0f;
+            rotated = false;
+            confirm.BlockUntilRelease();
+            dragCanceledUntilRelease = true;
+            if (data != null)
+            {
+                data.button = PointerEventData.InputButton.Left;
+                data.pointerPress = null;
+                data.rawPointerPress = null;
+                data.pointerEnter = null;
+                data.eligibleForClick = false;
+                data.dragging = false;
+                data.pointerDrag = canceledDrag;
+                if (releaseTarget) ExecuteEvents.Execute(releaseTarget, data, ExecuteEvents.pointerUpHandler);
+                if (canceledDrag) ExecuteEvents.Execute(canceledDrag, data, ExecuteEvents.endDragHandler);
+                data.pointerDrag = null;
+                if (hoverTarget) ExecuteEvents.Execute(hoverTarget, data, ExecuteEvents.pointerExitHandler);
+            }
+        }
+
+        private bool IsCurrentInteraction(int revision)
+        {
+            return isActiveAndEnabled && revision == interactionRevision && pointerSystem && pointerSystem == EventSystem.current;
         }
 
         public void Update()
         {
-            if (!EventSystem.current) return;
+            if (!EventSystem.current)
+            {
+                if (eventData != null) ResetInteraction();
+                eventData = null;
+                pointerSystem = null;
+                return;
+            }
             if (eventData == null || pointerSystem != EventSystem.current)
             {
-                OnDisable();
+                ResetInteraction();
+                if (!isActiveAndEnabled || !EventSystem.current) return;
                 pointerSystem = EventSystem.current;
                 eventData = new PointerEventData(pointerSystem);
             }
+            int revision = interactionRevision;
             float joystick = VRSettings.GetLeftHandedMode() ? SteamVR_Actions._default.LeftJoystick.axis.x : SteamVR_Actions._default.RightJoystick.axis.x;
             if (dragObject && Mathf.Abs(joystick) > 0.7f) rightJoyTimeHeld += Time.unscaledDeltaTime;
             else if (Mathf.Abs(joystick) < 0.7f) { rightJoyTimeHeld = 0f; rotated = false; }
@@ -105,9 +138,12 @@ namespace TarkovVR.Source.UI
             eventData.worldPosition = uiPointerPos;
             eventData.pointerEnter = hitObject;
             HandleHover();
+            if (!IsCurrentInteraction(revision)) return;
             HandleConfirm(); // Release must be delivered even when the ray leaves the UI.
+            if (!IsCurrentInteraction(revision)) return;
             if (hitObject) HandleScroll();
-            if (hitObject || dragObject) HandleDragging();
+            if (!IsCurrentInteraction(revision)) return;
+            HandleDragging(); // Observe trigger release even while pointing away from UI.
         }
 
         public void EndDrop()
@@ -119,12 +155,15 @@ namespace TarkovVR.Source.UI
         private void HandleHover()
         {
             if (lastHighlightedObject == hitObject) return;
-            if (lastHighlightedObject) ExecuteEvents.Execute(lastHighlightedObject, eventData, ExecuteEvents.pointerExitHandler);
+            int revision = interactionRevision;
+            var previous = lastHighlightedObject;
             lastHighlightedObject = null;
+            if (previous) ExecuteEvents.Execute(previous, eventData, ExecuteEvents.pointerExitHandler);
+            if (!IsCurrentInteraction(revision)) return;
             if (hitObject && (!dragObject || hitObject.GetComponent<HealthBarButton>()))
             {
-                ExecuteEvents.Execute(hitObject, eventData, ExecuteEvents.pointerEnterHandler);
                 lastHighlightedObject = hitObject;
+                ExecuteEvents.Execute(hitObject, eventData, ExecuteEvents.pointerEnterHandler);
             }
         }
 
@@ -140,6 +179,7 @@ namespace TarkovVR.Source.UI
 
         private void HandleConfirm()
         {
+            int revision = interactionRevision;
             var action = VRSettings.GetLeftHandedMode() ? SteamVR_Actions._default.ButtonX : SteamVR_Actions._default.ButtonA;
             var clickTarget = hitObject ? (ExecuteEvents.GetEventHandler<IPointerClickHandler>(hitObject) ?? hitObject) : null;
             var events = confirm.Step(action.stateDown, action.state, action.stateUp, hitObject,
@@ -159,14 +199,17 @@ namespace TarkovVR.Source.UI
                 eventData.rawPointerPress = hitObject;
                 pressedClickObject = clickTarget;
                 skipLeftClick = hitObject.GetComponent<EmptyItemView>();
-                pressedObject = ExecuteEvents.ExecuteHierarchy(hitObject, eventData, ExecuteEvents.pointerDownHandler) ?? clickTarget;
+                pressedObject = ExecuteEvents.GetEventHandler<IPointerDownHandler>(hitObject) ?? clickTarget;
                 eventData.pointerPress = pressedObject;
+                ExecuteEvents.Execute(pressedObject, eventData, ExecuteEvents.pointerDownHandler);
+                if (!IsCurrentInteraction(revision)) return;
             }
             if ((events & UiConfirmEvent.ContextClick) != 0 && pressedClickObject)
             {
                 eventData.button = PointerEventData.InputButton.Right;
                 eventData.clickCount = 1;
                 ExecuteEvents.Execute(pressedClickObject, eventData, ExecuteEvents.pointerClickHandler);
+                if (!IsCurrentInteraction(revision)) return;
             }
             if ((events & UiConfirmEvent.Up) != 0)
             {
@@ -174,6 +217,7 @@ namespace TarkovVR.Source.UI
                 var releaseTarget = pressedObject;
                 pressedObject = null;
                 if (releaseTarget) ExecuteEvents.Execute(releaseTarget, eventData, ExecuteEvents.pointerUpHandler);
+                if (!IsCurrentInteraction(revision)) return;
                 if ((events & UiConfirmEvent.Click) != 0 && !skipLeftClick && clickTarget)
                 {
                     clickCount = clickTarget == lastClickObject && Time.unscaledTime - lastClickTime <= 0.25f ? clickCount + 1 : 1;
@@ -184,6 +228,7 @@ namespace TarkovVR.Source.UI
                     string targetName = clickTarget.name;
                     string cameraName = interactionCamera ? interactionCamera.name : "none";
                     bool delivered = ExecuteEvents.Execute(clickTarget, eventData, ExecuteEvents.pointerClickHandler);
+                    if (!IsCurrentInteraction(revision)) return;
                     if (delivered && !loggedValidClick)
                     {
                         loggedValidClick = true;
@@ -200,19 +245,23 @@ namespace TarkovVR.Source.UI
 
         private void HandleScroll()
         {
+            int revision = interactionRevision;
             float axis = VRSettings.GetLeftHandedMode() ? SteamVR_Actions._default.LeftJoystick.axis.y : SteamVR_Actions._default.RightJoystick.axis.y;
             if (Mathf.Abs(axis) <= 0.4f) return;
             eventData.scrollDelta = new Vector2(0, axis / 1.5f);
             var noDrag = hitObject.GetComponentInParent<ScrollRectNoDrag>();
             if (noDrag) ExecuteEvents.Execute(noDrag.gameObject, eventData, ExecuteEvents.scrollHandler);
+            if (!IsCurrentInteraction(revision)) return;
             var scroll = hitObject.GetComponentInParent<ScrollRect>();
             if (scroll) ExecuteEvents.Execute(scroll.gameObject, eventData, ExecuteEvents.scrollHandler);
+            if (!IsCurrentInteraction(revision)) return;
             var light = hitObject.GetComponentInParent<LightScroller>();
             if (light) ExecuteEvents.Execute(light.gameObject, eventData, ExecuteEvents.scrollHandler);
         }
 
         private void HandleDragging()
         {
+            int revision = interactionRevision;
             eventData.button = PointerEventData.InputButton.Left;
             if (dragCanceledUntilRelease)
             {
@@ -230,8 +279,9 @@ namespace TarkovVR.Source.UI
                     eventData.pressPosition = eventData.position;
                     eventData.pointerPressRaycast = eventData.pointerCurrentRaycast;
                     eventData.pointerDrag = dragObject;
-                    eventData.dragging = true;
                     ExecuteEvents.Execute(dragObject, eventData, ExecuteEvents.initializePotentialDrag);
+                    if (!IsCurrentInteraction(revision) || !dragObject) return;
+                    eventData.dragging = true;
                     ExecuteEvents.Execute(dragObject, eventData, ExecuteEvents.beginDragHandler);
                 }
                 else
@@ -240,6 +290,7 @@ namespace TarkovVR.Source.UI
                     eventData.dragging = true;
                     ExecuteEvents.Execute(dragObject, eventData, ExecuteEvents.dragHandler);
                 }
+                if (!IsCurrentInteraction(revision)) return;
                 var cancel = VRSettings.GetLeftHandedMode() ? SteamVR_Actions._default.ButtonY : SteamVR_Actions._default.ButtonB;
                 if (dragObject && cancel.stateUp)
                 {

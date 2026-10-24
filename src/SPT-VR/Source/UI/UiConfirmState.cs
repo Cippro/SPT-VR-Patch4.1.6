@@ -18,11 +18,17 @@ namespace TarkovVR.Source.UI
         private bool contextClicked;
         private bool clickCanceled;
         private float heldSeconds;
+        private bool blockedUntilRelease;
 
         internal UiConfirmEvent Step(bool down, bool held, bool up, bool hasTarget, bool sameTarget, bool dragging, float deltaSeconds)
         {
             UiConfirmEvent result = UiConfirmEvent.None;
-            if (down)
+            if (blockedUntilRelease)
+            {
+                if (!held) blockedUntilRelease = false;
+                return result;
+            }
+            if (down && !pressed)
             {
                 Reset();
                 pressed = hasTarget;
@@ -39,10 +45,11 @@ namespace TarkovVR.Source.UI
                     result |= UiConfirmEvent.ContextClick;
                 }
             }
-            if (up)
+            // Losing the action/device may omit stateUp. Release the UI without clicking.
+            if (up || !held)
             {
                 result |= UiConfirmEvent.Up;
-                if (hasTarget && sameTarget && !contextClicked && !clickCanceled)
+                if (up && hasTarget && sameTarget && !contextClicked && !clickCanceled)
                     result |= UiConfirmEvent.Click;
                 Reset();
             }
@@ -55,6 +62,13 @@ namespace TarkovVR.Source.UI
             contextClicked = false;
             clickCanceled = false;
             heldSeconds = 0f;
+            blockedUntilRelease = false;
+        }
+
+        internal void BlockUntilRelease()
+        {
+            Reset();
+            blockedUntilRelease = true;
         }
     }
 }

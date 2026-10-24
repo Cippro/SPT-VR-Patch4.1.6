@@ -1,6 +1,6 @@
 # SPT-VR 1.3.0 pro SPT 4.1.6
 
-Testovací port pro single player z [cybensis/SPT-VR](https://github.com/cybensis/SPT-VR), commit `00600ee5f496da0be07cf3686ffe7ec88c00eaa8`. FIKA ani companion plugin nejsou součástí portu. Původní autoři a ovládání jsou popsaní v `src/SPT-VR/README.md`.
+Alfa port pro single player z [cybensis/SPT-VR](https://github.com/cybensis/SPT-VR), commit `00600ee5f496da0be07cf3686ffe7ec88c00eaa8`. FIKA ani companion plugin nejsou součástí portu. Původní autoři a ovládání jsou popsaní v `src/SPT-VR/README.md`.
 
 ## Stažení testovacího sestavení
 
@@ -10,9 +10,11 @@ Testovací port pro single player z [cybensis/SPT-VR](https://github.com/cybensi
 
 Balíčky jsou ve složce `releases/4.1.6-test`, včetně SHA256 součtů a přehledu kompatibility.
 
-Aktuální oprava **1.3.4.416** dorovnává výšku hlavního menu podle skutečné polohy očí v headsetu při zachování původního rozložení panelů. Inventář v raidu přepíná canvasy i ukazatel na kameru FPS. Opravené předávání stisku/uvolnění A/X zachovává krátký klik, podržení pro kontextovou nabídku a přetahování triggerem. Paprsek při potvrzení nemění barvu ani šířku.
+Uživatel označil **1.3.4.416 za funkční alfu**. Tato výchozí verze zůstává dostupná v [commitu b15a03e](https://github.com/Cippro/SPT-VR-Patch4.1.6/tree/b15a03e9c9071b6d46a2a3a08083e4f12dd525c0/releases/4.1.6-test). Ověření jednotlivých scénářů a další priority popisuje [stabilizace alfy](docs/alpha-stabilization.md).
 
-Verze 1.3.3.416 podle uživatelského testu zprovoznila hlavní menu i Scav raid. Její oprava přechodu z výběru postavy zůstává: VR nastavení čeká na nativní `Init`/obnovení prostředí, zachovává kontext Unity a obnovuje chybějící ruce/části sestavy. Nová 1.3.4.416 vyžaduje další test výšky a ovládání UI v headsetu.
+Aktuální testovací oprava **1.3.5.416** zpřesňuje ovládání při opakovaném otevírání UI: čeká na uvolnění původního potvrzovacího tlačítka, uklidí interakci při ztrátě/výměně EventSystemu a nepokračuje v klikání po zavření UI nativním callbackem. Ztracený release signál zruší stisk bez kliknutí. Tato změna vyžaduje ověření v headsetu.
+
+Z 1.3.4.416 zůstává dorovnání menu podle headsetu, původní rozložení panelů, FPS kamera inventáře a konstantní tenký paprsek. VR nastavení čeká na nativní `Init`/obnovení prostředí, zachovává kontext Unity a obnovuje chybějící ruce/části sestavy.
 
 Oprava 1.3.2.416 odstranila pád nativního JSON inicializátoru na pevných odkazech na volitelné mody. Výchozí DLL obsahuje základní VR port bez integrací EFT API, AmandsGraphics, DynamicMaps a WeaponCustomizer. Jejich zdroje zůstávají v repozitáři pro oddělený port.
 

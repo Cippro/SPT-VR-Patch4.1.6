@@ -8,6 +8,7 @@ internal static class UiConfirmRegression
         var eventType = plugin.GetType("TarkovVR.Source.UI.UiConfirmEvent", true);
         var step = stateType.GetMethod("Step", BindingFlags.Instance | BindingFlags.NonPublic);
         var reset = stateType.GetMethod("Reset", BindingFlags.Instance | BindingFlags.NonPublic);
+        var block = stateType.GetMethod("BlockUntilRelease", BindingFlags.Instance | BindingFlags.NonPublic);
         object state = Activator.CreateInstance(stateType, true);
         int down = Convert.ToInt32(Enum.Parse(eventType, "Down"));
         int up = Convert.ToInt32(Enum.Parse(eventType, "Up"));
@@ -60,6 +61,33 @@ internal static class UiConfirmRegression
         Tick(true, true, false);
         Check(Tick(false, true, false, target: false, same: false, dt: 0.3f), 0, "Holding away from the target does not activate another item");
         Check(Tick(false, false, true, target: false, same: false), up, "Outside release after a long hold clears the press");
+
+        Check(Tick(true, true, false), down, "A new press starts before simulated input loss");
+        Check(Tick(false, false, false), up, "Lost input releases the UI even without a release edge");
+        Check(Tick(false, false, true), 0, "A delayed release after input loss does not click");
+        Check(Tick(true, true, false), down, "A fresh press works after input loss");
+        Check(Tick(true, true, false), 0, "A duplicate down edge does not restart a held press");
+        Check(Tick(false, false, true), up | click, "Duplicate down still leads to only one click");
+
+        void Block() => block.Invoke(state, null);
+        Block();
+        Check(Tick(true, true, false, dt: 0.5f), 0, "Opening UI on the same down edge cannot click through");
+        Check(Tick(false, true, false, dt: 1f), 0, "A held opening action cannot become a context click");
+        Check(Tick(false, false, true), 0, "The opening action release only arms the next press");
+        Check(Tick(true, true, false), down, "A deliberate second press is accepted");
+        Check(Tick(false, false, true), up | click, "The second press clicks normally");
+
+        Tick(true, true, false);
+        Block();
+        Check(Tick(false, false, true), 0, "Lifecycle reset discards a pending click");
+        Check(Tick(true, true, false), down, "Press starts after reopening");
+        Check(Tick(false, true, false, dt: 0.3f), context, "Context action works after reopening");
+        Block();
+        Block();
+        Check(Tick(false, true, false, dt: 1f), 0, "Repeated lifecycle reset remains blocked while held");
+        Check(Tick(false, false, false), 0, "A neutral frame arms input without needing a release edge");
+        Check(Tick(true, true, false), down, "Press works after a neutral frame");
+        Check(Tick(false, false, true), up | click, "A context action from an earlier window cannot leak");
         Console.WriteLine($"UI confirm regression: {assertions} assertions passed against the compiled plugin.");
     }
 }

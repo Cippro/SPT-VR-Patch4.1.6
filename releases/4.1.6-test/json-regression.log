@@ -4,4 +4,4 @@ JSON defaults repaired: native item counts and string raid-side values are worki
 JSON defaults repaired: native item counts and string raid-side values are working.
 JSON regression: 93 assertions passed using supplied SPT 4.1.6 assemblies.
 Menu task regression: 10 assertions passed against the compiled plugin.
-UI confirm regression: 22 assertions passed against the compiled plugin.
+UI confirm regression: 40 assertions passed against the compiled plugin.

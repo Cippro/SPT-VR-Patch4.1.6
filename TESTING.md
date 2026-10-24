@@ -1,12 +1,12 @@
 # Testovací sestavení pro SPT 4.1.6
 
-Verze pluginu: **1.3.4.416**. Opravuje výšku menu, kameru a události inventáře v raidu a odstraňuje zelené zesílení paprsku při potvrzení. Uživatel potvrdil funkční hlavní menu a Scav raid s 1.3.3.416. Nová verze zatím čeká na ověření těchto UI úprav ve Windows s headsetem.
+Verze pluginu: **1.3.5.416**. Navazuje na uživatelem potvrzenou funkční alfu 1.3.4.416. Opravuje předávání drženého A/X do znovu otevřeného UI, úklid při změně UI systému a pokračování interakce po zavření okna nativním callbackem. Nová změna zatím čeká na ověření ve Windows s headsetem. Přehled potvrzeného stavu a priorit je v [plánu stabilizace](https://github.com/Cippro/SPT-VR-Patch4.1.6/blob/codex/port-spt-4.1.6/docs/alpha-stabilization.md).
 
 ## Aktualizace z předchozí testovací verze
 
 1. Ukončete hru a zálohujte profil i stávající plugin mimo `BepInEx/plugins`.
 2. Pokud jste už rozbalili celý testovací ZIP, nyní stačí nahradit **pouze** `BepInEx/plugins/sptvr/SPT-VR.dll`. XR soubory a assety se nemění.
-3. V novém `BepInEx/LogOutput.log` musí být verze `1.3.4.416`, zpráva `JSON defaults verified` nebo `JSON defaults repaired` a následně úspěšná inicializace VR. SPT.Core a SPT.Singleplayer se načítají před VR pluginem.
+3. V novém `BepInEx/LogOutput.log` musí být verze `1.3.5.416`, zpráva `JSON defaults verified` nebo `JSON defaults repaired` a následně úspěšná inicializace VR. SPT.Core a SPT.Singleplayer se načítají před VR pluginem.
 4. Ověřte přechod do hlavního menu po výběru/vytvoření postavy i při běžném přihlášení k existujícímu profilu. Menu musí být vidět v obou očích a reagovat na pohyb hlavy. Pravý ukazatel má fungovat tlačítkem A; v levostranném režimu tlačítkem X. V logu očekávejte `[MenuVR] Camera '...' configured for both eyes; controller rig restored.` a `[MenuVR] Main menu UI initialized after native Init completed.` Nesmí se objevit nová chyba `[MenuVR] ... failed` ani původní `AddAndFixMenuVRCam` výjimka.
 5. Po prvních platných stereo snímcích má být menu přibližně v úrovni očí, ne u podlahy. V logu očekávejte `[MenuVR] Headset height calibrated: ...`. Dorovnání proběhne jednou při vstupu/obnovení prostředí; menu pak nesleduje každé přikrčení. Pokud používáte stoj i sed, ověřte obě polohy při novém vstupu do menu.
 6. Na kopii profilu porovnejte peníze, stack munice, počet nábojů v zásobníku a nabídku obchodníka. Potom vyzkoušejte Scav i PMC raid. `getRaidTime` má vrátit úspěšnou odpověď.
@@ -14,6 +14,12 @@ Verze pluginu: **1.3.4.416**. Opravuje výšku menu, kameru a události inventá
 8. Ověřte přesun předmětu triggerem, puštění do platného slotu, puštění mimo UI a zrušení pomocí B. Zrušený drag se při stále drženém triggeru nesmí ihned znovu rozběhnout; nejprve trigger uvolněte. V levostranném režimu odpovídají tlačítka X/Y.
 9. Paprsek musí při krátkém i dlouhém A/X zůstat stejně tenký a stejné barvy. Než pokračujete v testu, ověřte, že přesuny na kopii profilu nepoškodily inventář.
 10. Zavřete inventář, ověřte dveře, kontejnery a volný loot, potom návrat do menu a změnu prostředí menu. Původní chyba `GetAvailableActions(...LootItem...)` kvůli chybějícímu vlastníkovi lootu se nemá vracet.
+
+## Opakované otevření UI — nové v 1.3.5.416
+
+Na kopii profilu proveďte alespoň deset cyklů otevření/zavření inventáře. Vyzkoušejte otevření při drženém A/X i triggeru; nejprve je uvolněte a potom stiskněte znovu. Držené potvrzení nesmí samo kliknout ani otevřít kontextovou nabídku v novém okně. Po uvolnění musí nový klik fungovat.
+
+Zavřete inventář během rozpracovaného dragu, znovu jej otevřete a vyzkoušejte další klik i přesun. Nesmí zůstat viset stisk, náhled předmětu nebo zvýraznění. Totéž ověřte při návratu z raidu do menu a v druhém raidu bez restartu hry. Zkontrolujte také přesnou akci, která okno sama zavírá, aby se její release nepředal do dalšího okna. Pokud lze bezpečně přerušit sledování ovladače během stisku, po obnovení nesmí dojít k opožděnému kliknutí.
 
 Oprava načítá skutečné hodnoty dodané serverem; nedopočítává ani neobnovuje již přepsané počty v uloženém profilu. Pokud byly změny uloženy, použijte nepoškozenou zálohu profilu. Není zatím potvrzeno, zda první test změnil i uložená data.
 
