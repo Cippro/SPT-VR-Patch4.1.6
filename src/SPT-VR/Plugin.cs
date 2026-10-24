@@ -2,10 +2,7 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using System;
-using System.IO;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using TarkovVR.ModSupport;
 using TarkovVR.Patches.Visuals;
 using Unity.XR.OpenVR;
 using UnityEngine;
@@ -19,7 +16,7 @@ using TarkovVR.Source.Compatibility;
 
 namespace TarkovVR
 {
-    [BepInPlugin("com.matsix.sptvr", "matsix-sptvr", "1.3.1.416")]
+    [BepInPlugin("com.matsix.sptvr", "matsix-sptvr", "1.3.2.416")]
     [BepInDependency("com.SPT.core")]
     [BepInDependency("com.SPT.singleplayer")]
     public class Plugin : BaseUnityPlugin
@@ -50,7 +47,6 @@ namespace TarkovVR
             Logger.LogInfo("SPTVR initialized successfully.");
             vrInitializedSuccessfully = true;
             ApplyPatches("TarkovVR.Patches");
-            InitializeConditionalPatches();
         }
 
         private bool InitializeVR()
@@ -214,109 +210,6 @@ namespace TarkovVR
             {
                 Plugin.MyLog.LogError($"[ActionSet Initialization Error] {ex.Message}");
             }
-        }
-
-        private void InitializeConditionalPatches()
-        {
-            if (!vrInitializedSuccessfully)
-                return; // Skip patching if VR failed to initialize
-            /*string modDllPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BepInEx\\plugins\\kmyuhkyuk-KmyTarkovApi\\KmyTarkovConfiguration.dll");
-
-            if (File.Exists(modDllPath))
-            {
-                // Load the assembly
-                Assembly modAssembly = Assembly.LoadFrom(modDllPath);
-
-                // Check for the required types and methods in the loaded assembly
-                Type configViewType = modAssembly.GetType("EFTConfiguration.Views.EFTConfigurationView");
-                if (configViewType != null)
-                {
-                    // Apply conditional patches
-                    InstalledMods.EFTApiInstalled = true;
-                    ApplyPatches("TarkovVR.ModSupport.EFTApi");
-                    MyLog.LogInfo("Dependent mod found and patches applied.");
-                }
-                else
-                {
-                    MyLog.LogWarning("Required types/methods not found in the dependent mod.");
-                }
-            }
-            else
-            {
-                MyLog.LogWarning("EFT API dll not found, support patches will not be applied.");
-            }*/
-            string modDllPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BepInEx\\plugins\\AmandsGraphics.dll");
-            if (File.Exists(modDllPath))
-            {
-                // Load the assembly
-                Assembly modAssembly = Assembly.LoadFrom(modDllPath);
-                // Check for the required types and methods in the loaded assembly
-                Type configViewType = modAssembly.GetType("AmandsGraphics.AmandsGraphicsClass");
-                if (configViewType != null)
-                {
-                    // Apply conditional patches
-                    InstalledMods.AmandsGraphicsInstalled = true;
-                    ApplyPatches("TarkovVR.ModSupport.AmandsGraphics");
-                    MyLog.LogInfo("AmandsGraphics found and patches applied.");
-                }
-                else
-                {
-                    MyLog.LogWarning("Required types/methods not found in the dependent mod.");
-                }
-            }
-            else
-            {
-                MyLog.LogWarning("AmandsGraphics dll not found, support patches will not be applied.");
-            }
-
-            modDllPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BepInEx\\plugins\\DynamicMaps\\DynamicMaps.dll");
-            if (File.Exists(modDllPath))
-            {
-                // Load the assembly
-                Assembly modAssembly = Assembly.LoadFrom(modDllPath);
-                // Check for the required types and methods in the loaded assembly
-                Type configViewType = modAssembly.GetType("DynamicMaps.Plugin");
-                if (configViewType != null)
-                {
-                    // Apply conditional patches
-                    InstalledMods.DynamicMapsInstalled = true;
-                    ApplyPatches("TarkovVR.ModSupport.DynamicMaps");
-                    MyLog.LogInfo("Dependent mod found and patches applied.");
-                }
-                else
-                {
-                    MyLog.LogWarning("Required types/methods not found in the dependent mod.");
-                }
-            }
-            else
-            {
-                MyLog.LogWarning("DynamicMaps dll not found, support patches will not be applied.");
-            }
-
-            modDllPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BepInEx\\plugins\\Tyfon.WeaponCustomizer.dll");
-            if (File.Exists(modDllPath))
-            {
-                // Load the assembly
-                Assembly modAssembly = Assembly.LoadFrom(modDllPath);
-                // Check for the required types and methods in the loaded assembly
-                Type configViewType = modAssembly.GetType("WeaponCustomizer.DraggableBone");
-                if (configViewType != null)
-                {
-                    // Apply conditional patches
-                    InstalledMods.WeaponCustomizerInstalled = true;
-                    ApplyPatches("TarkovVR.ModSupport.WeaponCustomizer");
-                    MyLog.LogInfo("Dependent mod found and patches applied.");
-                }
-                else
-                {
-                    MyLog.LogWarning("Required types/methods not found in the dependent mod.");
-                }
-            }
-            else
-            {
-                MyLog.LogWarning("WeaponCustomizer dll not found, support patches will not be applied.");
-            }
-        // Optional graphics/map/customizer integrations.
         }
 
         private void ApplyPatches(string @namespace)

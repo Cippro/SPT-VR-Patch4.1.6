@@ -3,7 +3,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>SPT-VR</AssemblyName>
     <RootNamespace>TarkovVR</RootNamespace>
-    <Version>1.3.1.416</Version>
+    <Version>1.3.2.416</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <Description>SPT-VR port for SPT 4.1.6; single player</Description>
@@ -12,20 +12,17 @@
   </PropertyGroup>
   <Import Project="/workspace/shared/spt-vr-setup/publicized.props" Condition="'$(SptVrReferences)' == '' and Exists('/workspace/shared/spt-vr-setup/publicized.props')" />
   <ItemGroup>
+    <!-- Keep legacy integration sources for a separate port; the standalone DLL
+         must be discoverable when none of those mods are installed. -->
+    <Compile Remove="ModSupport/*Support.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="BepInEx.Analyzers" Version="1.0.8" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.4.21" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" PrivateAssets="all" />
     <PackageReference Include="UnityEngine.Modules" Version="2019.4.39" IncludeAssets="compile" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Aki.Reflection">
-      <HintPath>lib/Aki.Reflection.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="AmandsGraphics">
-      <HintPath>lib/AmandsGraphics.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
     <Reference Include="AnimationSystem.Types">
       <HintPath>$(SptVrReferences)/Managed/AnimationSystem.Types.dll</HintPath>
       <Private>false</Private>
@@ -54,20 +51,8 @@
       <HintPath>$(SptVrReferences)/Managed/CommonExtensions.dll</HintPath>
       <Private>false</Private>
     </Reference>
-    <Reference Include="DynamicMaps">
-      <HintPath>lib/DynamicMaps.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="EFTConfiguration">
-      <HintPath>lib/KmyTarkovConfiguration.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
     <Reference Include="ItemComponent.Types">
       <HintPath>$(SptVrReferences)/Managed/ItemComponent.Types.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="KmyTarkovConfiguration">
-      <HintPath>lib/KmyTarkovConfiguration.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp">
@@ -88,10 +73,6 @@
     </Reference>
     <Reference Include="SteamVR_Actions">
       <HintPath>$(SptVrReferences)/VRManaged/SteamVR_Actions.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Tyfon.WeaponCustomizer">
-      <HintPath>lib/Tyfon.WeaponCustomizer.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="Unity.Postprocessing.Runtime">

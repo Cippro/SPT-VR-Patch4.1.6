@@ -23,7 +23,7 @@ dotnet build tests/Compatibility/Compatibility.csproj --no-restore --configurati
 mkdir -p artifacts
 dotnet run --no-build --no-restore --configuration Release --project tests/Compatibility/Compatibility.csproj -- \
   "$repository/src/SPT-VR/bin/Release/netstandard2.1/SPT-VR.dll" \
-  "$references/Managed" "$repository/src/SPT-VR/lib" > artifacts/compatibility.json
+  "$references/Managed" > artifacts/compatibility.json
 python3 - <<'PY'
 import json
 from pathlib import Path
@@ -41,6 +41,6 @@ fi
 dotnet restore tests/JsonRegression/JsonRegression.csproj --locked-mode "-p:SptVrReferences=$raw_references"
 dotnet build tests/JsonRegression/JsonRegression.csproj --no-restore --configuration Release "-p:SptVrReferences=$raw_references"
 dotnet run --no-build --no-restore --configuration Release --project tests/JsonRegression/JsonRegression.csproj -- \
-  "$raw_references/Managed" | tee artifacts/json-regression.log
+  "$raw_references/Managed" "$repository/src/SPT-VR/bin/Release/netstandard2.1/SPT-VR.dll" "$raw_references/VRManaged" | tee artifacts/json-regression.log
 cp src/SPT-VR/bin/Release/netstandard2.1/SPT-VR.dll artifacts/SPT-VR.dll
 python3 scripts/package.py

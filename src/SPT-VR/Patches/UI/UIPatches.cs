@@ -37,7 +37,6 @@ using EFT.Rendering.Clouds;
 using EFT.UI.Gestures;
 using System.Collections;
 using TarkovVR.Source.Player.Interactions;
-using Aki.Reflection.Utils;
 using TarkovVR.Patches.Visuals;
 
 namespace TarkovVR.Patches.UI

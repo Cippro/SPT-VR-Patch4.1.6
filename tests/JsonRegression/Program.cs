@@ -4,21 +4,37 @@ using System.Runtime.Loader;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
-using TarkovVR.Source.Compatibility;
 
 class Program
 {
     static int assertions;
+    static Assembly plugin;
+    static readonly HashSet<string> optionalAssemblies = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Aki.Reflection", "AmandsGraphics", "DynamicMaps", "KmyTarkovConfiguration", "Tyfon.WeaponCustomizer"
+    };
 
     static void Main(string[] args)
     {
-        if (args.Length != 1) throw new ArgumentException("Usage: JsonRegression <raw-Managed-directory>");
-        string directory = Path.GetFullPath(args[0]);
+        if (args.Length != 3) throw new ArgumentException("Usage: JsonRegression <raw-Managed-directory> <SPT-VR.dll> <VRManaged-directory>");
+        var directories = new List<string> { Path.GetFullPath(args[0]), Path.GetFullPath(args[2]) };
+        string packages = Environment.GetEnvironmentVariable("NUGET_PACKAGES") ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
+        foreach (var package in new[] { "bepinex.baselib", "harmonyx", "monomod.utils", "monomod.runtimedetour", "mono.cecil" })
+        {
+            string root = Path.Combine(packages, package);
+            if (Directory.Exists(root)) directories.AddRange(Directory.GetDirectories(root, "netstandard2.0", SearchOption.AllDirectories));
+        }
         AssemblyLoadContext.Default.Resolving += (_, name) =>
         {
-            string path = Path.Combine(directory, name.Name + ".dll");
-            return File.Exists(path) ? AssemblyLoadContext.Default.LoadFromAssemblyPath(path) : null;
+            if (optionalAssemblies.Contains(name.Name)) throw new FileNotFoundException("Optional mods are deliberately unavailable in this test: " + name.Name);
+            foreach (string directory in directories)
+            {
+                string path = Path.Combine(directory, name.Name + ".dll");
+                if (File.Exists(path)) return AssemblyLoadContext.Default.LoadFromAssemblyPath(path);
+            }
+            return null;
         };
+        plugin = AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.GetFullPath(args[1]));
         Run();
     }
 
@@ -26,6 +42,18 @@ class Program
     [MethodImpl(MethodImplOptions.NoInlining)]
     static void Run()
     {
+        // Load the complete shipped DLL before running native converter discovery.
+        // Metadata validation separately rejects optional assembly references in
+        // signatures; .NET cannot reflect every Unity/Mono delegate signature.
+        Assert(!plugin.GetReferencedAssemblies().Any(a => optionalAssemblies.Contains(a.Name)), "Shipped DLL must not require optional mods");
+        var pluginTypes = plugin.GetTypes();
+        foreach (Type type in pluginTypes)
+        {
+            // Match the native FindCustomConverters filter, including short circuiting.
+            if (typeof(JsonConverter).IsAssignableFrom(type) && !type.IsAbstract && !type.IsGenericTypeDefinition)
+                _ = type.GetConstructor(Type.EmptyTypes);
+        }
+        Console.WriteLine($"Runtime dependency scan: {pluginTypes.Length} plugin types loaded without optional mods before native JSON discovery.");
         var original = JsonConvert.DefaultSettings;
         try
         {
@@ -49,16 +77,16 @@ class Program
             catch (System.Text.Json.JsonException) { assertions++; }
 
             // Exercise the real game's Unity converter initializer, not a replacement fixture.
-            Console.WriteLine(GameJsonBootstrap.Initialize());
+            Console.WriteLine(InitializeBootstrap());
             CheckItemsAndRaid();
             var installed = JsonConvert.DefaultSettings;
-            GameJsonBootstrap.Initialize();
+            InitializeBootstrap();
             Assert(installed == JsonConvert.DefaultSettings, "Bootstrap is idempotent");
 
             var custom = new MarkerConverter();
             var shared = new JsonSerializerSettings { DateFormatString = "yyyy-MM", Converters = new List<JsonConverter> { custom } };
             JsonConvert.DefaultSettings = () => shared;
-            Console.WriteLine(GameJsonBootstrap.Initialize());
+            Console.WriteLine(InitializeBootstrap());
             Assert(JsonConvert.DefaultSettings().DateFormatString == "yyyy-MM", "Existing settings survive");
             Assert(JsonConvert.DefaultSettings().Converters[0] == custom, "Custom converter retains priority");
             Assert(shared.Converters.Count == 3, "Only the two required converters are added");
@@ -70,7 +98,7 @@ class Program
                 calls++;
                 return new JsonSerializerSettings { Converters = new List<JsonConverter> { custom, new StringEnumConverter() } };
             };
-            Console.WriteLine(GameJsonBootstrap.Initialize());
+            Console.WriteLine(InitializeBootstrap());
             CheckItemsAndRaid();
             Assert(calls > 3, "Fresh-settings factory is preserved and used");
             var converters = JsonConvert.DefaultSettings().Converters;
@@ -80,6 +108,12 @@ class Program
         }
         finally { JsonConvert.DefaultSettings = original; }
         Console.WriteLine($"JSON regression: {assertions} assertions passed using supplied SPT 4.1.6 assemblies.");
+    }
+
+    static string InitializeBootstrap()
+    {
+        var type = plugin.GetType("TarkovVR.Source.Compatibility.GameJsonBootstrap", true);
+        return (string)type.GetMethod("Initialize", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, null);
     }
 
     static Dictionary<string, UnparsedData> ReadUpd(int count)

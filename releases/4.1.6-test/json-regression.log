@@ -1,4 +1,5 @@
+Runtime dependency scan: 195 plugin types loaded without optional mods before native JSON discovery.
 JSON defaults verified: native item counts and string raid-side values are working.
 JSON defaults repaired: native item counts and string raid-side values are working.
 JSON defaults repaired: native item counts and string raid-side values are working.
-JSON regression: 92 assertions passed using supplied SPT 4.1.6 assemblies.
+JSON regression: 93 assertions passed using supplied SPT 4.1.6 assemblies.

@@ -2,9 +2,9 @@
 
 Aktualizováno 24. 10. 2026. Zdrojový projekt je obnovený z cybensis/SPT-VR a převedený v tomto repozitáři, `src/SPT-VR`, ve větvi `codex/port-spt-4.1.6`.
 
-Release `1.3.1.416` se sestavuje bez chyb. Kontrola kompatibility ověřila všech 293 Harmony patchů bez selhání. Dalších 92 kontrol ověřilo opravu JSON pro počty předmětů a formát požadavku na raid nad původními Managed 4.1.6. Testovací DLL a kompletní ZIP jsou v `artifacts/` a `releases/4.1.6-test/`. FIKA je vynechaná. PIP update/target zůstává nativní a VR zoom i reticle úpravy jsou zachované.
+Release `1.3.2.416` se sestavuje bez chyb. Kontrola kompatibility ověřila všech 276 základních Harmony patchů bez selhání. Z původních 293 bylo vyřazeno pouze 17 patchů volitelných integrací; žádný základní VR patch nechybí. Celá DLL se načetla bez volitelných modů (195 typů), potom prošla nativní inicializací JSON a 93 regresními kontrolami nad původními Managed 4.1.6. Testovací DLL a kompletní ZIP jsou v `artifacts/` a `releases/4.1.6-test/`. FIKA je vynechaná. PIP update/target zůstává nativní a VR zoom i reticle úpravy jsou zachované.
 
-První uživatelský test starší 1.3.0.416 potvrdil funkční menu, ale hlásil stacky 1 a chybu na konci načítání raidu. Nová verze opravuje chybějící JSON defaults před XR; podrobná analýza je v `docs/runtime-report-2026-10-24.md`. Další krok je opakovat test s novou DLL a kopií profilu ve Windows se SPT 4.1.6 a SteamVR/headsetem.
+První uživatelský test starší 1.3.0.416 potvrdil funkční menu, ale hlásil stacky 1 a chybu na konci načítání raidu. Log verze 1.3.1.416 pak určil konkrétní příčinu: nativní vyhledávání JSON převodníků selhalo na poli volitelné integrace s chybějícím `KmyTarkovConfiguration`. Nová DLL tyto nepoužívané integrace nekompiluje a nemá na ně assembly reference. Podrobná analýza je v `docs/runtime-report-2026-10-24.md`. Další krok je opakovat test s novou DLL a kopií profilu ve Windows se SPT 4.1.6 a SteamVR/headsetem.
 
 Podrobnosti: `README.md`, `VALIDATION.md`, `TESTING.md`. Build: `bash scripts/build.sh`.
 

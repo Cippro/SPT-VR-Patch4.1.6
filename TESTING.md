@@ -1,12 +1,12 @@
 # Testovací sestavení pro SPT 4.1.6
 
-Verze pluginu: **1.3.1.416**. Opravuje inicializaci JSON pro počty předmětů a požadavky na raid. Předchozí `1.3.0.416` podle hlášení fungovala v menu, ale zobrazovala stacky jako 1 a nedokončila načtení raidu. Nová verze zatím čeká na ověření ve Windows s headsetem.
+Verze pluginu: **1.3.2.416**. Opravuje pevné závislosti na nepřítomných volitelných modech, které rozbíjely inicializaci JSON. Předchozí `1.3.0.416` fungovala v menu, ale zobrazovala stacky jako 1 a nedokončila načtení raidu. `1.3.1.416` skončila při startu JSON na chybějícím `KmyTarkovConfiguration`. Nová verze zatím čeká na ověření ve Windows s headsetem.
 
-## Aktualizace z 1.3.0.416
+## Aktualizace z předchozí testovací verze
 
 1. Ukončete hru a zálohujte profil i stávající plugin mimo `BepInEx/plugins`.
 2. Pokud jste už rozbalili celý testovací ZIP, nyní stačí nahradit **pouze** `BepInEx/plugins/sptvr/SPT-VR.dll`. XR soubory a assety se nemění.
-3. V novém `BepInEx/LogOutput.log` musí být verze `1.3.1.416` a zpráva `JSON defaults verified` nebo `JSON defaults repaired` před inicializací VR. SPT.Core a SPT.Singleplayer se nyní načítají před VR pluginem.
+3. V novém `BepInEx/LogOutput.log` musí být verze `1.3.2.416`, zpráva `JSON defaults verified` nebo `JSON defaults repaired` a následně úspěšná inicializace VR. Nesmí se vrátit `TypeLoadException` kvůli `KmyTarkovConfiguration` ani jinému volitelnému modu. SPT.Core a SPT.Singleplayer se načítají před VR pluginem.
 4. Nejprve na kopii profilu porovnejte peníze, stack munice, počet nábojů v zásobníku a nabídku obchodníka. Před tímto ověřením neprovádějte transakce.
 5. Potom zkuste PMC raid. `getRaidTime` má vrátit úspěšnou odpověď a načítání má pokračovat za původní chybu v `ScavLateStartPatch`. Následně otestujte Scav raid.
 
@@ -21,6 +21,8 @@ Oprava načítá skutečné hodnoty dodané serverem; nedopočítává ani neobn
 5. Spusťte SteamVR a potom hru přes SPT launcher.
 
 Archivy `Managed` a publicized reference jsou pouze pro sestavení. Nekopírujte je do hry.
+
+Testovací DLL neobsahuje integrace EFT API, AmandsGraphics, DynamicMaps ani WeaponCustomizer. Chybějící `KmyTarkovConfiguration` se řeší aktualizací této DLL; pro tento test není potřeba instalovat další mod.
 
 ## Kontrola funkčnosti
 

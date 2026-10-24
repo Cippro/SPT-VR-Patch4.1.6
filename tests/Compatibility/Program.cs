@@ -2,7 +2,7 @@ using Mono.Cecil;
 using System.Text.RegularExpressions;
 using System.Text.Json;
 
-if (args.Length < 3) throw new ArgumentException("Usage: Compatibility <SPT-VR.dll> <Managed-directory> <optional-mod-lib-directory>");
+if (args.Length < 2) throw new ArgumentException("Usage: Compatibility <SPT-VR.dll> <Managed-directory> [extra-reference-directories]");
 var types = new Dictionary<string, TypeDefinition>();
 IEnumerable<TypeDefinition> Flatten(IEnumerable<TypeDefinition> source) {
     foreach (var t in source) { yield return t; foreach (var n in Flatten(t.NestedTypes)) yield return n; }
@@ -100,6 +100,9 @@ foreach (var type in Flatten(mod.MainModule.Types)) {
     }
 }
 if(mod.MainModule.AssemblyReferences.Any(r => r.Name.Contains("Fika",StringComparison.OrdinalIgnoreCase))) failures.Add(new {problem="Unexpected FIKA assembly dependency"});
+var optionalMods=new[]{"Aki.Reflection","AmandsGraphics","DynamicMaps","KmyTarkovConfiguration","Tyfon.WeaponCustomizer"};
+foreach(var reference in mod.MainModule.AssemblyReferences.Where(r=>optionalMods.Contains(r.Name))) failures.Add(new{problem="Standalone DLL must not require optional mods during type discovery",assembly=reference.Name});
+if(Flatten(mod.MainModule.Types).Any(t=>t.Namespace.StartsWith("TarkovVR.ModSupport.") && t.Name.EndsWith("Support"))) failures.Add(new{problem="Legacy optional integration types must not be compiled into the standalone DLL"});
 var plugin = mod.MainModule.Types.Single(t=>t.FullName=="TarkovVR.Plugin");
 var pluginInfo = plugin.CustomAttributes.Single(a=>a.AttributeType.Name=="BepInPlugin");
 if((string)pluginInfo.ConstructorArguments[2].Value!=mod.Name.Version.ToString()) failures.Add(new{problem="Plugin and assembly versions disagree",plugin=pluginInfo.ConstructorArguments[2].Value,assembly=mod.Name.Version.ToString()});

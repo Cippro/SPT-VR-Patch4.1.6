@@ -1,5 +1,5 @@
 {
-  "bound": 293,
+  "bound": 276,
   "dynamicCount": 0,
   "bindings": [
     {
@@ -1381,91 +1381,6 @@
       "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.FixCollimatorParallaxEffect",
       "target": "CollimatorSight",
       "method": "OnEnable"
-    },
-    {
-      "patch": "TarkovVR.ModSupport.WeaponCustomizer.WeaponCustomizerSupport.BeginDragPrefix",
-      "target": "WeaponCustomizer.DraggableBone",
-      "method": "OnBeginDrag"
-    },
-    {
-      "patch": "TarkovVR.ModSupport.WeaponCustomizer.WeaponCustomizerSupport.DragPrefix",
-      "target": "WeaponCustomizer.DraggableBone",
-      "method": "OnDrag"
-    },
-    {
-      "patch": "TarkovVR.ModSupport.WeaponCustomizer.WeaponCustomizerSupport.EndDragPostfix",
-      "target": "WeaponCustomizer.DraggableBone",
-      "method": "OnEndDrag"
-    },
-    {
-      "patch": "TarkovVR.ModSupport.EFTApi.EFTApiSupport.SetEFTConfigWindow",
-      "target": "KmyTarkovConfiguration.Views.EFTConfigurationView",
-      "method": "CreateUI"
-    },
-    {
-      "patch": "TarkovVR.ModSupport.EFTApi.EFTApiSupport.HandleDragging",
-      "target": "KmyTarkovConfiguration.Views.Drag",
-      "method": "OnDrag"
-    },
-    {
-      "patch": "TarkovVR.ModSupport.DynamicMaps.DynamicMapsSupport.SetMapViewWorldCamera",
-      "target": "DynamicMaps.UI.Components.MapView",
-      "method": "LoadMap"
-    },
-    {
-      "patch": "TarkovVR.ModSupport.DynamicMaps.DynamicMapsSupport.DisableMinimap",
-      "target": "DynamicMaps.UI.Components.MapPeekComponent",
-      "method": "HandleMinimapState"
-    },
-    {
-      "patch": "TarkovVR.ModSupport.DynamicMaps.DynamicMapsSupport.FixMapPositionInRaid",
-      "target": "DynamicMaps.UI.ModdedMapScreen",
-      "method": "OnShowInRaid"
-    },
-    {
-      "patch": "TarkovVR.ModSupport.DynamicMaps.DynamicMapsSupport.FixMapLabelScale",
-      "target": "DynamicMaps.UI.Components.MapLabel",
-      "method": "Create"
-    },
-    {
-      "patch": "TarkovVR.ModSupport.DynamicMaps.DynamicMapsSupport.FixMarkerLabelScale",
-      "target": "DynamicMaps.UI.Components.MapMarker",
-      "method": "Create"
-    },
-    {
-      "patch": "TarkovVR.ModSupport.DynamicMaps.DynamicMapsSupport.VRCursorUpdate",
-      "target": "DynamicMaps.UI.Controls.CursorPositionText",
-      "method": "Update"
-    },
-    {
-      "patch": "TarkovVR.ModSupport.DynamicMaps.DynamicMapsSupport.FixTextureResolution",
-      "target": "DynamicMaps.Utils.TextureUtils",
-      "method": "LoadTexture2DFromPath"
-    },
-    {
-      "patch": "TarkovVR.ModSupport.DynamicMaps.DynamicMapsSupport.SuppressReadConfigError",
-      "target": "DynamicMaps.UI.ModdedMapScreen",
-      "method": "ReadConfig"
-    },
-    {
-      "patch": "TarkovVR.ModSupport.AmandsGraphics.AmandsGraphicsSupport.BlockOpticDepthOfFieldClass",
-      "target": "AmandsGraphics.AmandsGraphicsClass",
-      "method": "ActivateAmandsOpticDepthOfField"
-    },
-    {
-      "patch": "TarkovVR.ModSupport.AmandsGraphics.AmandsGraphicsSupport.BlockOpticSightPatch",
-      "target": "AmandsGraphics.AmandsGraphicsOpticSightPatch",
-      "method": "PatchPostFix"
-    },
-    {
-      "patch": "TarkovVR.ModSupport.AmandsGraphics.AmandsGraphicsSupport.BlockOpticPatch",
-      "target": "AmandsGraphics.AmandsGraphicsOpticPatch",
-      "method": "PatchPostFix"
-    },
-    {
-      "patch": "TarkovVR.ModSupport.AmandsGraphics.AmandsGraphicsSupport.BlockSomeOtherOpticPatch",
-      "target": "AmandsGraphics.AmandsGraphicsmethod_25Patch",
-      "method": "PatchPostFix"
     }
   ],
   "failures": []

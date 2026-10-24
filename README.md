@@ -10,11 +10,13 @@ Testovací port pro single player z [cybensis/SPT-VR](https://github.com/cybensi
 
 Balíčky jsou ve složce `releases/4.1.6-test`, včetně SHA256 součtů a přehledu kompatibility.
 
-Aktuální oprava **1.3.1.416** řeší chybějící výchozí JSON převodníky, které způsobovaly chyby `StackObjectsCount` a nesprávný číselný formát `Side` v požadavku na raid. Inicializuje nativní Unity převodníky před XR a ověří načtení počtu i textový formát strany. Zachovává existující nastavení serializace; případně doplní pouze dva potřebné převodníky. Pokud už máte předchozí testovací ZIP, aktualizujte jen DLL podle [TESTING.md](TESTING.md). Oprava ještě vyžaduje opakovaný test ve hře.
+Aktuální oprava **1.3.2.416** řeší pád nativního JSON inicializátoru při hledání typů v DLL. Starší sestavení obsahovala pevné odkazy na volitelné mody, například `KmyTarkovConfiguration`, které při jejich absenci způsobily `TypeLoadException`. Výchozí DLL nyní obsahuje základní VR port bez integrací EFT API, AmandsGraphics, DynamicMaps a WeaponCustomizer. Jejich zdroje zůstávají v repozitáři pro oddělený port.
+
+Oprava JSON z 1.3.1.416 zůstává: před XR ověří načtení skutečných počtů předmětů a textový formát strany v požadavku na raid. Nový regresní test načítá **celou sestavenou DLL** s blokovanými volitelnými závislostmi a potom spouští skutečný nativní JSON inicializátor. Pokud už máte předchozí testovací ZIP, aktualizujte jen DLL podle [TESTING.md](TESTING.md). Nová verze ještě vyžaduje opakovaný test ve hře.
 
 ## Stav a optika
 
-Kód se sestavuje proti dodaným knihovnám 4.1.6 pro `netstandard2.1`. Metadata test ověřuje všech 293 Harmony patchů: cíle, overloady, parametry a injektovaná pole. Ověřuje také absenci FIKA závislostí, zachování nativních aktualizací PIP/retiklu a ukládání zoomu do `SightComponent.ScopeZoomValue`.
+Kód se sestavuje proti dodaným knihovnám 4.1.6 pro `netstandard2.1`. Metadata test ověřuje všech 276 základních Harmony patchů: cíle, overloady, parametry a injektovaná pole. Dřívější počet 293 zahrnoval také 17 patchů volitelných integrací. Ověřuje také absenci FIKA a dalších volitelných assembly závislostí, zachování nativních aktualizací PIP/retiklu a ukládání zoomu do `SightComponent.ScopeZoomValue`.
 
 PIP kamera, její render target a aktualizační smyčka zůstávají nativní. VR upravuje rozlišení, far clip, ovládání zoomu a zarovnání/ostrost retiklu. Kopie pro ostrý retikl vzniká v samostatné textuře po PIP renderu. Obecné SSAA úpravy targetu mají výjimku pro nativní optickou kameru.
 
@@ -28,7 +30,7 @@ V připraveném cloudovém prostředí spusťte:
 bash scripts/build.sh
 ```
 
-Skript obnoví zamčené závislosti, sestaví Release, ověří kompatibilitu a spustí regresní test JSON nad dodanými herními assembly. Test nejprve reprodukuje původní chyby a pak ověří stacky, stav předmětů, požadavky PMC/Scav a zachování existujících nastavení serializace. Vytvoří `artifacts/SPT-VR.dll`, `artifacts/SPT-VR-4.1.6-test.zip`, jejich SHA256 součty a `artifacts/json-regression.log`. ZIP vychází z původního balíčku 1.3.0 s novou DLL a bez FIKA. Referenční knihovny hry se do balíčku nepřidávají.
+Skript obnoví zamčené závislosti, sestaví Release, ověří kompatibilitu a spustí regresní test JSON nad celou výslednou DLL a dodanými herními assembly. Volitelné mody nejsou dostupné resolveru testu. Test nejprve reprodukuje původní chyby JSON a pak ověří stacky, stav předmětů, požadavky PMC/Scav a zachování existujících nastavení serializace. Vytvoří `artifacts/SPT-VR.dll`, `artifacts/SPT-VR-4.1.6-test.zip`, jejich SHA256 součty a `artifacts/json-regression.log`. ZIP vychází z původního balíčku 1.3.0 s novou DLL a bez FIKA. Referenční knihovny hry se do balíčku nepřidávají.
 
 V cloudu JSON test používá původní nepřepsané Managed 4.1.6. Na jiném počítači lze jejich kořen zadat přes `SPT_VR_RAW_REFERENCES`; bez něj použije stejné reference jako sestavení.
 
