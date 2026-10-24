@@ -73,7 +73,7 @@ namespace TarkovVR.Patches.Misc
         [HarmonyPatch(typeof(HideoutScreenOverlay), "Show")]
         private static void HandleHideoutOverlay(HideoutScreenOverlay __instance)
         {
-            UIPatches.ShowUiScreens();
+            UIPatches.ShowUiScreens(Camera.main);
             if (!hideoutUiCam)
             {
                 GameObject camHolder = new GameObject("hideoutUiCam");

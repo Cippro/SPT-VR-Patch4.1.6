@@ -10,11 +10,13 @@ Testovací port pro single player z [cybensis/SPT-VR](https://github.com/cybensi
 
 Balíčky jsou ve složce `releases/4.1.6-test`, včetně SHA256 součtů a přehledu kompatibility.
 
-Aktuální oprava **1.3.3.416** řeší přechod z výběru postavy do hlavního menu. VR nastavení menu se provádí po dokončení nativního `Init`/obnovení prostředí, se zachováním kontextu Unity. Chybějící ruce, ukazatel a části rigu se podle potřeby obnoví. Menu a jeho UI kamera mají zapnuté obě oči a canvasy používají aktuální kameru. Ovladače používají existující akce `LeftHandPose`/`RightHandPose` a tlačítka A/X.
+Aktuální oprava **1.3.4.416** dorovnává výšku hlavního menu podle skutečné polohy očí v headsetu při zachování původního rozložení panelů. Inventář v raidu přepíná canvasy i ukazatel na kameru FPS. Opravené předávání stisku/uvolnění A/X zachovává krátký klik, podržení pro kontextovou nabídku a přetahování triggerem. Paprsek při potvrzení nemění barvu ani šířku.
+
+Verze 1.3.3.416 podle uživatelského testu zprovoznila hlavní menu i Scav raid. Její oprava přechodu z výběru postavy zůstává: VR nastavení čeká na nativní `Init`/obnovení prostředí, zachovává kontext Unity a obnovuje chybějící ruce/části sestavy. Nová 1.3.4.416 vyžaduje další test výšky a ovládání UI v headsetu.
 
 Oprava 1.3.2.416 odstranila pád nativního JSON inicializátoru na pevných odkazech na volitelné mody. Výchozí DLL obsahuje základní VR port bez integrací EFT API, AmandsGraphics, DynamicMaps a WeaponCustomizer. Jejich zdroje zůstávají v repozitáři pro oddělený port.
 
-Oprava JSON z 1.3.1.416 zůstává: před XR ověří načtení skutečných počtů předmětů a textový formát strany v požadavku na raid. Regresní test načítá **celou sestavenou DLL** s blokovanými volitelnými závislostmi a potom spouští skutečný nativní JSON inicializátor. Další test ověřuje načasování menu a zachování synchronizačního kontextu. Pokud už máte předchozí testovací ZIP, aktualizujte jen DLL podle [TESTING.md](TESTING.md). Nová verze ještě vyžaduje opakovaný test ve hře.
+Oprava JSON z 1.3.1.416 zůstává: před XR ověří načtení skutečných počtů předmětů a textový formát strany v požadavku na raid. Regresní test načítá **celou sestavenou DLL** s blokovanými volitelnými závislostmi a potom spouští skutečný nativní JSON inicializátor. Další testy ověřují načasování menu, synchronizační kontext a stav potvrzovacího tlačítka. Pokud už máte předchozí testovací ZIP, aktualizujte jen DLL podle [TESTING.md](TESTING.md).
 
 ## Stav a optika
 

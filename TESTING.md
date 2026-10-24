@@ -1,15 +1,19 @@
 # Testovací sestavení pro SPT 4.1.6
 
-Verze pluginu: **1.3.3.416**. Opravuje chybu přechodu z výběru postavy do VR menu: čeká na dokončení nativního načítání, obnoví chybějící ovladače a nastaví menu kamery pro obě oči. `1.3.2.416` už podle uživatelského logu úspěšně spustila JSON a SteamVR, ale při vstupu do menu skončila na `AddAndFixMenuVRCam`. Nová verze zatím čeká na ověření ve Windows s headsetem.
+Verze pluginu: **1.3.4.416**. Opravuje výšku menu, kameru a události inventáře v raidu a odstraňuje zelené zesílení paprsku při potvrzení. Uživatel potvrdil funkční hlavní menu a Scav raid s 1.3.3.416. Nová verze zatím čeká na ověření těchto UI úprav ve Windows s headsetem.
 
 ## Aktualizace z předchozí testovací verze
 
 1. Ukončete hru a zálohujte profil i stávající plugin mimo `BepInEx/plugins`.
 2. Pokud jste už rozbalili celý testovací ZIP, nyní stačí nahradit **pouze** `BepInEx/plugins/sptvr/SPT-VR.dll`. XR soubory a assety se nemění.
-3. V novém `BepInEx/LogOutput.log` musí být verze `1.3.3.416`, zpráva `JSON defaults verified` nebo `JSON defaults repaired` a následně úspěšná inicializace VR. SPT.Core a SPT.Singleplayer se načítají před VR pluginem.
+3. V novém `BepInEx/LogOutput.log` musí být verze `1.3.4.416`, zpráva `JSON defaults verified` nebo `JSON defaults repaired` a následně úspěšná inicializace VR. SPT.Core a SPT.Singleplayer se načítají před VR pluginem.
 4. Ověřte přechod do hlavního menu po výběru/vytvoření postavy i při běžném přihlášení k existujícímu profilu. Menu musí být vidět v obou očích a reagovat na pohyb hlavy. Pravý ukazatel má fungovat tlačítkem A; v levostranném režimu tlačítkem X. V logu očekávejte `[MenuVR] Camera '...' configured for both eyes; controller rig restored.` a `[MenuVR] Main menu UI initialized after native Init completed.` Nesmí se objevit nová chyba `[MenuVR] ... failed` ani původní `AddAndFixMenuVRCam` výjimka.
-5. Na kopii profilu porovnejte peníze, stack munice, počet nábojů v zásobníku a nabídku obchodníka. Před tímto ověřením neprovádějte transakce.
-6. Potom zkuste PMC raid. `getRaidTime` má vrátit úspěšnou odpověď a načítání má pokračovat za původní chybu v `ScavLateStartPatch`. Následně otestujte Scav raid, návrat do menu a změnu prostředí menu.
+5. Po prvních platných stereo snímcích má být menu přibližně v úrovni očí, ne u podlahy. V logu očekávejte `[MenuVR] Headset height calibrated: ...`. Dorovnání proběhne jednou při vstupu/obnovení prostředí; menu pak nesleduje každé přikrčení. Pokud používáte stoj i sed, ověřte obě polohy při novém vstupu do menu.
+6. Na kopii profilu porovnejte peníze, stack munice, počet nábojů v zásobníku a nabídku obchodníka. Potom vyzkoušejte Scav i PMC raid. `getRaidTime` má vrátit úspěšnou odpověď.
+7. V raidu otevřete inventář. Log má uvést `[VR UI] Interaction camera bound to 'FPS Camera'`. Ověřte hover, krátké A pro klik, dvojklik na stejný předmět a podržení A pro pravou kontextovou nabídku. Uvolnění po podržení nesmí navíc vybrat položku levým klikem. Uvolnění mimo UI nesmí ponechat tlačítko stisknuté. První předané potvrzení se vypíše jako `[VR UI] Confirm delivered ...`.
+8. Ověřte přesun předmětu triggerem, puštění do platného slotu, puštění mimo UI a zrušení pomocí B. Zrušený drag se při stále drženém triggeru nesmí ihned znovu rozběhnout; nejprve trigger uvolněte. V levostranném režimu odpovídají tlačítka X/Y.
+9. Paprsek musí při krátkém i dlouhém A/X zůstat stejně tenký a stejné barvy. Než pokračujete v testu, ověřte, že přesuny na kopii profilu nepoškodily inventář.
+10. Zavřete inventář, ověřte dveře, kontejnery a volný loot, potom návrat do menu a změnu prostředí menu. Původní chyba `GetAvailableActions(...LootItem...)` kvůli chybějícímu vlastníkovi lootu se nemá vracet.
 
 Oprava načítá skutečné hodnoty dodané serverem; nedopočítává ani neobnovuje již přepsané počty v uloženém profilu. Pokud byly změny uloženy, použijte nepoškozenou zálohu profilu. Není zatím potvrzeno, zda první test změnil i uložená data.
 

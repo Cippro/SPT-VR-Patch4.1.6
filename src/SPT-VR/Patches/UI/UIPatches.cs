@@ -197,7 +197,7 @@ namespace TarkovVR.Patches.UI
         {
             //PatchTracer.TraceAllMyPatches(VRGlobals.harmonyInstance);
             Cursor.lockState = CursorLockMode.Locked;
-            ShowUiScreens();
+            ShowUiScreens(VRGlobals.VRCam);
             if (VRGlobals.player?.PlayerBody?.MeshTransform != null)
                 foreach (var renderer in VRGlobals.player.PlayerBody.MeshTransform.GetComponentsInChildren<Renderer>(true))
                     renderer.enabled = false;
@@ -721,7 +721,7 @@ namespace TarkovVR.Patches.UI
             {
                 var hic = VRGlobals.handsInteractionController;
                 bool isHeld = hic != null && lootItem != null && hic.heldItem == lootItem;
-                if (lootItem.Item == null)
+                if (lootItem.ItemOwner == null || lootItem.ItemOwner.RootItem == null || lootItem.Item == null)
                 {
                     interactableObject = null;
                 }
@@ -939,8 +939,9 @@ namespace TarkovVR.Patches.UI
             VRGlobals.preloaderUi.GetChild(0).GetComponent<Canvas>().enabled = false;
         }
 
-        public static void ShowUiScreens()
+        public static void ShowUiScreens(Camera interactionCamera = null)
         {
+            MenuPatches.BindUiCamera(interactionCamera);
             if (VRGlobals.vrPlayer != null)
                 VRGlobals.vrPlayer.ForceUnlockHand();
             if (VRGlobals.menuUi)

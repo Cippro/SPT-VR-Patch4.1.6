@@ -130,6 +130,19 @@ foreach(var name in new[]{"OnDisable","OnDestroy"}) {
     if(!manager.Methods.Single(m=>m.Name==name).Body.Instructions.Any(i=>i.Operand is MethodReference m && m.Name=="RemovePoseListeners")) failures.Add(new{problem="Menu controller listeners must be detached during teardown",method=name});
 }
 var weapon = mod.MainModule.Types.First(t=>t.FullName=="TarkovVR.Patches.Core.Player.WeaponPatches");
+var ui=mod.MainModule.Types.Single(t=>t.FullName=="TarkovVR.Patches.UI.UIPatches");
+var openInventory=ui.Methods.Single(m=>m.Name=="HandleOpenInventory").Body.Instructions;
+if(!openInventory.Any(i=>i.Operand is MethodReference m && m.Name=="ShowUiScreens" && i.Previous?.Operand is FieldReference f && f.Name=="VRCam")) failures.Add(new{problem="Raid inventory must bind its live FPS UI camera"});
+if(!ui.Methods.Single(m=>m.Name=="ShowUiScreens").Body.Instructions.Any(i=>i.Operand is MethodReference m && m.Name=="BindUiCamera")) failures.Add(new{problem="Opening UI must update the canvas interaction camera"});
+var interacter=mod.MainModule.Types.Single(t=>t.FullName=="TarkovVR.Source.UI.VRUIInteracter");
+var raycast=interacter.Methods.Single(m=>m.Name=="RaycastFindHit").Body.Instructions;
+foreach(var name in new[]{"get_rootCanvas","get_worldCamera","set_pointerCurrentRaycast"}) if(!raycast.Any(i=>i.Operand is MethodReference m && m.Name==name)) failures.Add(new{problem="VR UI raycast must retain native camera and raycast metadata",member=name});
+var confirmHandler=interacter.Methods.Single(m=>m.Name=="HandleConfirm").Body.Instructions;
+foreach(var name in new[]{"set_pointerPressRaycast","set_pointerPress","set_pressPosition"}) if(!confirmHandler.Any(i=>i.Operand is MethodReference m && m.Name==name)) failures.Add(new{problem="VR confirm must retain native pointer press metadata",member=name});
+var pointerUpdate=mod.MainModule.Types.Single(t=>t.FullName=="TarkovVR.Source.Misc.LaserPointer").Methods.Single(m=>m.Name=="Update").Body.Instructions;
+if(pointerUpdate.Any(i=>i.Operand is FieldReference f && f.Name=="clickColor") || pointerUpdate.Any(i=>i.Operand is MethodReference m && m.Name=="GetState")) failures.Add(new{problem="Confirm must not turn the laser green or widen it"});
+var height=mod.MainModule.Types.Single(t=>t.FullName=="TarkovVR.Source.UI.MenuHeightCalibration").Methods.Single(m=>m.Name=="LateUpdate").Body.Instructions;
+foreach(var name in new[]{"get_isValid","get_stereoEnabled","GetStereoViewMatrix"}) if(!height.Any(i=>i.Operand is MethodReference m && m.Name==name)) failures.Add(new{problem="Menu height must be calibrated from a valid rendered headset pose",member=name});
 foreach(var name in new[]{"AlignHeadsetReticle","ApplyHeadsetOpticLimits"}) {
     var method=weapon.Methods.FirstOrDefault(m=>m.Name==name);
     if(method==null || !method.CustomAttributes.Any(a=>a.AttributeType.Name=="HarmonyPostfix") || method.ReturnType.FullName!="System.Void") failures.Add(new{problem="Native PIP/reticle update must be retained",method=name});

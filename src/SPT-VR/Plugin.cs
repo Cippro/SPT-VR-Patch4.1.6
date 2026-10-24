@@ -16,7 +16,7 @@ using TarkovVR.Source.Compatibility;
 
 namespace TarkovVR
 {
-    [BepInPlugin("com.matsix.sptvr", "matsix-sptvr", "1.3.3.416")]
+    [BepInPlugin("com.matsix.sptvr", "matsix-sptvr", "1.3.4.416")]
     [BepInDependency("com.SPT.core")]
     [BepInDependency("com.SPT.singleplayer")]
     public class Plugin : BaseUnityPlugin

@@ -172,6 +172,27 @@ namespace TarkovVR.Patches.Misc
             PositionCommonUi();
             PositionMenuUi();
             PositionPreloaderUi();
+            BindUiCamera(menuCamera);
+            if (!VRGlobals.inGame && menuCamera && VRGlobals.menuUi && VRGlobals.menuUi.childCount > 0)
+            {
+                var calibration = menuCamera.GetComponent<MenuHeightCalibration>() ?? menuCamera.gameObject.AddComponent<MenuHeightCalibration>();
+                calibration.Request(menuCamera, menuCamera.transform.parent, VRGlobals.menuUi.GetChild(0));
+            }
+        }
+
+        public static void BindUiCamera(Camera camera)
+        {
+            if (!camera) return;
+            bool changed = false;
+            foreach (Transform root in new[] { VRGlobals.commonUi, VRGlobals.menuUi, VRGlobals.preloaderUi })
+            {
+                if (!root || root.childCount == 0) continue;
+                var canvas = root.GetChild(0).GetComponent<Canvas>();
+                if (!canvas || canvas.worldCamera == camera) continue;
+                canvas.worldCamera = camera;
+                changed = true;
+            }
+            if (changed) Plugin.MyLog.LogInfo($"[VR UI] Interaction camera bound to '{camera.name}'.");
         }
 
         private static void PositionMenuUi()
@@ -186,7 +207,6 @@ namespace TarkovVR.Patches.Misc
                 PreloaderUI.DontDestroyOnLoad(VRGlobals.menuUi.gameObject);
                 VRGlobals.menuUi.transform.eulerAngles = Vector3.zero;
                 otherMenuCanvas.renderMode = RenderMode.WorldSpace;
-                otherMenuCanvas.worldCamera = menuCamera;
                 VRGlobals.menuUi.transform.localScale = new Vector3(0.0015f, 0.0015f, 0.0015f);
                 VRGlobals.menuUi.transform.position = new Vector3(0f, -999.9333f, 1);
                 otherMenuCanvas.transform.localScale = new Vector3(1, 1, 1);
@@ -205,7 +225,6 @@ namespace TarkovVR.Patches.Misc
                     PreloaderUI.DontDestroyOnLoad(VRGlobals.preloaderUi.gameObject);
                     VRGlobals.preloaderUi.transform.eulerAngles = Vector3.zero;
                     overlayCanvas.renderMode = RenderMode.WorldSpace;
-                    overlayCanvas.worldCamera = menuCamera;
                     VRGlobals.preloaderUi.transform.localScale = new Vector3(0.0015f, 0.0015f, 0.0015f);
                     VRGlobals.preloaderUi.transform.position = new Vector3(0f, -999.9333f, 1);
                     overlayCanvas.transform.localScale = new Vector3(1, 1, 1);
@@ -226,7 +245,6 @@ namespace TarkovVR.Patches.Misc
                     return;
                 menuUICanvas.enabled = true;
                 menuUICanvas.renderMode = RenderMode.WorldSpace;
-                menuUICanvas.worldCamera = menuCamera;
                 menuUICanvas.additionalShaderChannels = AdditionalCanvasShaderChannels.TexCoord1 | AdditionalCanvasShaderChannels.Normal | AdditionalCanvasShaderChannels.Tangent;
                 menuUICanvas.RectTransform().localScale = new Vector3(1.3333f, 1.3333f, 1.3333f);
                 menuUICanvas.RectTransform().anchoredPosition = new Vector3(1280, 720, 0);
@@ -791,10 +809,10 @@ namespace TarkovVR.Patches.Misc
         [HarmonyPatch(typeof(ItemView), "Update")]
         private static bool FixDragAndDropButton(ItemView __instance)
         {
-            bool triggerPressed = (VRSettings.GetLeftHandedMode() ? SteamVR_Actions._default.LeftTrigger.axis : SteamVR_Actions._default.RightTrigger.axis) >= 0.7f;
-            if (__instance._lastKnownMouseEvent != null && !triggerPressed)
+            bool triggerPressed = VRUIInteracter.IsDragPressed();
+            if (__instance._lastKnownMouseEvent != null && !triggerPressed && (!vrUiInteracter || !vrUiInteracter.IsDragging))
             {
-                vrUiInteracter.EndDrop();
+                if (vrUiInteracter) vrUiInteracter.EndDrop();
                 var eventData = __instance._lastKnownMouseEvent;
                 if (eventData.pointerEnter != null && eventData.pointerEnter.gameObject == null)
                     eventData.pointerEnter = null;
@@ -1119,7 +1137,7 @@ namespace TarkovVR.Patches.Misc
             Transform mainMenuCam = EnvironmentUI.Instance._currentEnvironment.CameraContainer.Find("MainMenuCamera");
             PositionMenuEnvironmentProps();
             PositionMainMenuUi();
-            UIPatches.ShowUiScreens();
+            UIPatches.ShowUiScreens(menuCamera);
             //VRGlobals.vrPlayer.enabled = false;
             VRGlobals.menuVRManager.enabled = true;
             VRGlobals.menuOpen = true;

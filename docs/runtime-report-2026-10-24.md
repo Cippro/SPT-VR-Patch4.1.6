@@ -1,5 +1,33 @@
 # Oprava JSON po prvním testu ve hře
 
+## Aktualizace 1.3.4.416 — výška menu, inventář a potvrzení
+
+Uživatel potvrdil funkční hlavní menu a dokončený vstup do Scav raidu s 1.3.3.416. Log obsahuje úspěšné `getRaidTime` i uložení Scav profilu. Zbývající hlášené problémy: menu v úrovni podlahy, zobrazený inventář bez interakce a nežádoucí zelené zesílení paprsku při A. Uživatel upřesnil, že původní verze tento zelený efekt neměla.
+
+### Zjištění a změny
+
+- Menu zachovávalo původní pevné souřadnice UI, ale nesrovnávalo je se skutečnou výškou očí při floor tracking originu. Nový `MenuHeightCalibration` počká na platnou stereo/headset pose a dva snímky, čte pozici obou očí z inverzních stereo view matic a jednorázově posune menu tracking origin. Panely zůstávají v původním rozložení a přibližně 3 cm pod úrovní očí. Stejný posun dostane soustava ovladačů. Kalibrace se neprovádí v raidu ani průběžně při každém pohybu hlavy.
+- Canvasy přenášené z hlavního menu do raidu si ponechaly jeho `worldCamera`, zatímco ukazatel promítal hit přes `Camera.main`/FPS. `ShowUiScreens` nyní dostává příslušnou kameru explicitně: FPS pro inventář, menu kameru pro raidové menu a aktuální kameru pro hideout. UI raycast bere kameru z kořenového canvasu.
+- `PointerEventData` se nyní zachovává mezi snímky, včetně nativního výsledku raycastu, press raycastu a screen-space press pozice. Release se předá původnímu cíli i po opuštění UI; při vypnutí se stav uklidí. Krátké A/X znamená levý klik, podržení pravý klik; po podržení se už navíc neodesílá levý klik. Trigger drag používá jednotný práh, zachovává native drag metadata a při zrušení čeká na uvolnění triggeru. Native fallback v `ItemView.Update` neukončuje současně tentýž drag spravovaný VR interaktorem.
+- Napojení A v 1.3.3.416 aktivovalo dříve nepoužitou barevnou větev `LaserPointer`. Ta je odstraněná: barva i tloušťka paprsku jsou při potvrzení konstantní. Ovládání A/X je oddělené od vzhledu ukazatele.
+
+V logu je také nativní výjimka:
+
+```text
+NullReferenceException
+at InteractionContextHelper.GetAvailableActions(GamePlayerOwner, LootItem) [0x00007]
+at GamePlayerOwner.InteractionsChangedHandler()
+at UIPatches.Raycaster(Player)
+```
+
+Nativní metoda ihned čte `lootItem.ItemOwner.RootItem`; původní VR raycast kontroloval pouze `lootItem.Item`. Nová kontrola nepředá do nativní nabídky loot bez vlastníka/root itemu.
+
+### Ověření a meze
+
+Zůstává všech 276 základních Harmony cílů. Celá DLL načte 202 typů bez volitelných modů; prošlo 93 kontrol JSON a 10 kontrol menu tasků. Nových 22 kontrol skutečného `UiConfirmState` ze sestavené DLL ověřuje krátký klik, jedinou kontextovou akci, release mimo UI/na jiném cíli, reset, držené tlačítko při vstupu a potlačení kliknutí při dragu. Metadata kontrolují FPS binding inventáře, kameru canvasu, press/raycast údaje, podmínky kalibrace a absenci barevného/šířkového efektu A v laser updateru.
+
+Tyto testy nespouštějí Unity `EventSystem`, skutečný renderer ani pohyby headsetu. Výšku, UI klikání a transakce drag/drop je potřeba ověřit na kopii profilu podle `TESTING.md`. V logu jsou také chyby rozměrů některých render textur při spuštění raidu; tato UI oprava je neřeší a není potvrzením bezchybného vykreslování všech efektů.
+
 ## Aktualizace 1.3.3.416 — přechod z výběru postavy do VR menu
 
 Další log verze 1.3.2.416 potvrzuje `JSON defaults verified`, úspěšnou inicializaci SteamVR s Quest 3 a úspěšný požadavek `/singleplayer/clientmods`. Při vstupu do hlavního menu po výběru postavy pak nastala jiná chyba:

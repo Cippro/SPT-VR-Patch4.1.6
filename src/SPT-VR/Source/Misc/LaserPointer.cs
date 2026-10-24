@@ -143,16 +143,9 @@ namespace TarkovVR.Source.Misc
                 OnPointerClick(argsClick);
             }
 
-            if (interactWithUI != null && interactWithUI.GetState(pose.inputSource))
-            {
-                pointer.transform.localScale = new Vector3(thickness * 5f, thickness * 5f, dist);
-                pointerRenderer.material.color = clickColor;
-            }
-            else
-            {
-                pointer.transform.localScale = new Vector3(thickness, thickness, dist);
-                pointerRenderer.material.color = color;
-            }
+            // Confirm input is handled by VRUIInteracter; it must not change the beam.
+            pointer.transform.localScale = new Vector3(thickness, thickness, dist);
+            pointerRenderer.material.color = color;
 
             pointer.transform.localPosition = new Vector3(0f, 0f, dist / 2f);
         }
