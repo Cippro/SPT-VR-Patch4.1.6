@@ -1,0 +1,115 @@
+using Mono.Cecil;
+using System.Text.RegularExpressions;
+using System.Text.Json;
+
+if (args.Length < 3) throw new ArgumentException("Usage: Compatibility <SPT-VR.dll> <Managed-directory> <optional-mod-lib-directory>");
+var types = new Dictionary<string, TypeDefinition>();
+IEnumerable<TypeDefinition> Flatten(IEnumerable<TypeDefinition> source) {
+    foreach (var t in source) { yield return t; foreach (var n in Flatten(t.NestedTypes)) yield return n; }
+}
+string Definition(string name) {
+    while (Regex.IsMatch(name, "<[^<>]*>")) name = Regex.Replace(name, "<[^<>]*>", "");
+    return name;
+}
+foreach (var directory in args.Skip(1)) {
+    foreach (var path in Directory.GetFiles(directory, "*.dll")) {
+        var assembly = AssemblyDefinition.ReadAssembly(path);
+        foreach (var type in Flatten(assembly.MainModule.Types)) types.TryAdd(type.FullName, type);
+    }
+}
+TypeDefinition? Resolve(TypeReference? type) => type != null && types.TryGetValue(Definition(type.FullName), out var t) ? t : null;
+IEnumerable<MethodDefinition> Methods(TypeDefinition? type) {
+    var seen = new HashSet<string>();
+    while (type != null && seen.Add(type.FullName)) {
+        foreach (var method in type.Methods) yield return method;
+        type = Resolve(type.BaseType);
+    }
+}
+bool FieldExists(TypeDefinition? type, string name) {
+    var seen = new HashSet<string>();
+    while (type != null && seen.Add(type.FullName)) {
+        if (type.Fields.Any(f => f.Name == name)) return true;
+        type = Resolve(type.BaseType);
+    }
+    return false;
+}
+var failures = new List<object>();
+var bindings = new List<object>();
+var resolver = new DefaultAssemblyResolver();
+resolver.AddSearchDirectory(Path.GetDirectoryName(Path.GetFullPath(args[0]))!);
+foreach (var directory in args.Skip(1)) resolver.AddSearchDirectory(directory);
+var packages = Environment.GetEnvironmentVariable("NUGET_PACKAGES") ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),".nuget","packages");
+if (Directory.Exists(Path.Combine(packages,"harmonyx"))) foreach (var dll in Directory.GetFiles(Path.Combine(packages,"harmonyx"),"0Harmony.dll",SearchOption.AllDirectories)) resolver.AddSearchDirectory(Path.GetDirectoryName(dll)!);
+using var mod = AssemblyDefinition.ReadAssembly(args[0], new ReaderParameters {AssemblyResolver=resolver});
+foreach (var type in Flatten(mod.MainModule.Types)) types.TryAdd(type.FullName,type);
+int bound = 0, dynamicCount = 0;
+foreach (var type in Flatten(mod.MainModule.Types)) {
+    foreach (var patch in type.Methods.Where(m => m.CustomAttributes.Any(a => new[] {"HarmonyPrefix", "HarmonyPostfix", "HarmonyTranspiler", "HarmonyFinalizer"}.Contains(a.AttributeType.Name)))) {
+        var attributes = type.CustomAttributes.Concat(patch.CustomAttributes).Where(a => a.AttributeType.Name == "HarmonyPatch");
+        TypeReference? targetRef = null; string? name = null; int methodType = 0; TypeReference[]? argumentTypes = null;
+        foreach (var attr in attributes) foreach (var a in attr.ConstructorArguments) {
+            if (a.Value is TypeReference tr) targetRef = tr;
+            else if (a.Type.FullName == "System.String") name = a.Value as string;
+            else if (a.Type.FullName == "HarmonyLib.MethodType") methodType = Convert.ToInt32(a.Value);
+            else if (a.Type.FullName == "System.Type[]" && a.Value is CustomAttributeArgument[] arr) argumentTypes = arr.Select(v => (TypeReference)v.Value).ToArray();
+        }
+        string id = type.FullName + "." + patch.Name;
+        if (targetRef == null || name == null && methodType < 3) {
+            if (type.Methods.Any(m => m.Name is "TargetMethod" or "TargetMethods" || m.CustomAttributes.Any(a=>a.AttributeType.Name is "HarmonyTargetMethod" or "HarmonyTargetMethods"))) { dynamicCount++; continue; }
+            failures.Add(new { patch = id, problem = "No target specified" }); continue;
+        }
+        var target = Resolve(targetRef);
+        if (target == null) { failures.Add(new { patch=id, problem="Missing type", target=targetRef.FullName }); continue; }
+        string methodName = methodType switch { 1 => "get_" + name, 2 => "set_" + name, 3 => ".ctor", 4 => ".cctor", _ => name! };
+        var matches = Methods(target).Where(m => m.Name == methodName).ToArray();
+        var declared=matches.Where(m=>m.DeclaringType.FullName==target.FullName).ToArray();
+        if(declared.Length>0)matches=declared;
+        string ActualType(TypeReference parameter) => parameter is GenericParameter gp && targetRef is GenericInstanceType gi && gp.Position < gi.GenericArguments.Count ? gi.GenericArguments[gp.Position].FullName : parameter.FullName;
+        if (argumentTypes != null) matches = matches.Where(m => m.Parameters.Select(p => ActualType(p.ParameterType)).SequenceEqual(argumentTypes.Select(a => a.FullName))).ToArray();
+        if (matches.Length == 0) { failures.Add(new { patch=id, problem="Missing method", target=targetRef.FullName, method=methodName }); continue; }
+        if(argumentTypes==null && matches.Length>1) failures.Add(new{patch=id,problem="Ambiguous overload",target=targetRef.FullName,method=methodName,parameters=matches.Select(m=>m.Parameters.Select(p=>p.ParameterType.FullName))});
+        bound++;
+        bindings.Add(new {patch=id,target=targetRef.FullName,method=methodName});
+        if (patch.CustomAttributes.Any(a=>a.AttributeType.Name=="HarmonyTranspiler")) continue;
+        string Element(TypeReference t) => ActualType(t is ByReferenceType by ? by.ElementType : t);
+        bool Assignable(string actual, string accepted) {
+            if (actual==accepted || accepted=="System.Object") return true;
+            var seen=new HashSet<string>();
+            while(types.TryGetValue(Definition(actual),out var current) && seen.Add(current.FullName)) {
+                if(current.Interfaces.Any(i=>i.InterfaceType.FullName==accepted)) return true;
+                actual=current.BaseType?.FullName ?? "";
+                if(actual==accepted)return true;
+            }
+            return false;
+        }
+        foreach (var parameter in patch.Parameters) {
+            string p = parameter.Name;
+            if (p.StartsWith("___")) {
+                if (!FieldExists(target,p[3..])) failures.Add(new { patch=id, problem="Missing injected field", target=targetRef.FullName, member=p[3..] });
+            } else if (p=="__instance") {
+                if (!Assignable(targetRef.FullName,Element(parameter.ParameterType))) failures.Add(new{patch=id,problem="Incompatible instance",target=targetRef.FullName,member=p,expected=targetRef.FullName,actual=Element(parameter.ParameterType)});
+            } else if (p=="__result") {
+                if (!matches.Any(m=>Assignable(ActualType(m.ReturnType),Element(parameter.ParameterType)))) failures.Add(new{patch=id,problem="Incompatible result",target=targetRef.FullName,member=p,expected=matches.Select(m=>ActualType(m.ReturnType)),actual=Element(parameter.ParameterType)});
+            } else if (p.StartsWith("__")) continue;
+            else if (!matches.Any(m=>m.Parameters.Any(q=>q.Name==p))) {
+                failures.Add(new { patch=id, problem="Unbound argument", target=targetRef.FullName, method=methodName, member=p, parameters=matches.Select(m=>m.Parameters.Select(q=>new {name=q.Name,type=q.ParameterType.FullName})) });
+            } else if (!matches.Any(m=>m.Parameters.Any(q=>q.Name==p && Assignable(Element(q.ParameterType),Element(parameter.ParameterType))))) failures.Add(new{patch=id,problem="Incompatible argument",target=targetRef.FullName,method=methodName,member=p,expected=matches.SelectMany(m=>m.Parameters.Where(q=>q.Name==p).Select(q=>Element(q.ParameterType))),actual=Element(parameter.ParameterType)});
+        }
+    }
+}
+if(mod.MainModule.AssemblyReferences.Any(r => r.Name.Contains("Fika",StringComparison.OrdinalIgnoreCase))) failures.Add(new {problem="Unexpected FIKA assembly dependency"});
+var plugin = mod.MainModule.Types.Single(t=>t.FullName=="TarkovVR.Plugin");
+var pluginInfo = plugin.CustomAttributes.Single(a=>a.AttributeType.Name=="BepInPlugin");
+if((string)pluginInfo.ConstructorArguments[2].Value!=mod.Name.Version.ToString()) failures.Add(new{problem="Plugin and assembly versions disagree",plugin=pluginInfo.ConstructorArguments[2].Value,assembly=mod.Name.Version.ToString()});
+var weapon = mod.MainModule.Types.First(t=>t.FullName=="TarkovVR.Patches.Core.Player.WeaponPatches");
+foreach(var name in new[]{"AlignHeadsetReticle","ApplyHeadsetOpticLimits"}) {
+    var method=weapon.Methods.FirstOrDefault(m=>m.Name==name);
+    if(method==null || !method.CustomAttributes.Any(a=>a.AttributeType.Name=="HarmonyPostfix") || method.ReturnType.FullName!="System.Void") failures.Add(new{problem="Native PIP/reticle update must be retained",method=name});
+}
+var zoom=Flatten(mod.MainModule.Types).Single(t=>t.FullName=="TarkovVR.Source.Weapons.VROpticController").Methods.Single(m=>m.Name=="ApplyZoomState");
+if(!zoom.Body.Instructions.Any(i=>i.OpCode.Code==Mono.Cecil.Cil.Code.Stfld && i.Operand is FieldReference f && f.DeclaringType.Name=="SightComponent" && f.Name=="ScopeZoomValue")) failures.Add(new{problem="VR zoom must persist through native SightComponent state"});
+foreach(var method in Flatten(mod.MainModule.Types).SelectMany(t=>t.Methods).Where(m=>m.HasBody)) {
+    if(method.Body.Instructions.Any(i=>i.Operand is MethodReference called && called.DeclaringType.FullName=="UnityEngine.Camera" && called.Name=="set_targetTexture") && !method.Body.Instructions.Any(i=>i.Operand is MethodReference guard && guard.Name=="IsNativeOpticCamera")) failures.Add(new{problem="A camera-target override lacks the native PIP exclusion",method=method.FullName});
+}
+Console.WriteLine(JsonSerializer.Serialize(new { bound, dynamicCount, bindings, failures }, new JsonSerializerOptions {WriteIndented=true}));
+return failures.Count==0 ? 0 : 1;

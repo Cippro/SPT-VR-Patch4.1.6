@@ -1,0 +1,1472 @@
+{
+  "bound": 293,
+  "dynamicCount": 0,
+  "bindings": [
+    {
+      "patch": "TarkovVR.Patches.Visuals.AOPatches.CustomAOSet",
+      "target": "EFT.CameraControl.CameraManager",
+      "method": "SetSSAO"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.AOPatches.StartAOTimer",
+      "target": "EFT.UI.PreloaderUI",
+      "method": "ShowRaidStartInfo"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.AOPatches.CountAOTimer",
+      "target": "EFT.Player",
+      "method": "VisualPass"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.GPUInstancerPatches.OverrideGrassMotionVectorMatrices",
+      "target": "GPUInstancer.GPUInstancerManager",
+      "method": "ClearMotionVectorData"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.GPUInstancerPatches.ForceVRComputeShader",
+      "target": "GPUInstancer.GPUInstancerManager",
+      "method": "Awake"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.GPUInstancerPatches.FixGpuInstancerCulling",
+      "target": "GPUInstancer.GPUInstancerCameraData",
+      "method": "CalculateCameraData"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.ImpostorCullingPatches.WidenImpostorCullFrustum",
+      "target": "EFT.Impostors.ImpostorsMainCameraContext",
+      "method": "UpdateFrustum"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.PostProcessing.FixPostProcessing",
+      "target": "UnityEngine.Rendering.PostProcessing.PostProcessLayer",
+      "method": "InitLegacy"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.Rendering.ReturnVROutputHeight",
+      "target": "SSAAImpl",
+      "method": "GetOutputHeight"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.Rendering.ReturnVROutputWidth",
+      "target": "SSAAImpl",
+      "method": "GetOutputWidth"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.Rendering.SSAAVROutputHeight",
+      "target": "SSAA",
+      "method": "GetOutputHeight"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.Rendering.SSAAVROutputWidth",
+      "target": "SSAA",
+      "method": "GetOutputWidth"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.Rendering.SSAAVROutputWidth",
+      "target": "SSAAImpl",
+      "method": "ApplySwitch"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.Rendering.DisableSSAA",
+      "target": "SSAA",
+      "method": "Awake"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.Rendering.ProcessImageRendering",
+      "target": "SSAAPropagator",
+      "method": "OnRenderImage"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.Rendering.FixSSAAImplRenderImage",
+      "target": "SSAAImpl",
+      "method": "RenderImage"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.Rendering.SampleCountSet",
+      "target": "SSAA",
+      "method": "LateUpdate"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.VisualPatches.LimitExposureForVR",
+      "target": "EFT.EnvironmentEffect.EnvironmentManager",
+      "method": "Update"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.VisualPatches.PatchVolumetricLightingToVR",
+      "target": "VolumetricLightRenderer",
+      "method": "OnPreRender"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.VisualPatches.FixHBAOMethod4Stereo",
+      "target": "HBAO",
+      "method": "RenderHBAO"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.VisualPatches.CleanupHBAOStereo",
+      "target": "HBAO",
+      "method": "OnDisable"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.VisualPatches.DisableInvBlurOnEnable",
+      "target": "InventoryBlur",
+      "method": "Enable"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.VisualPatches.DisableInvBlurOnAwake",
+      "target": "InventoryBlur",
+      "method": "Awake"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.VisualPatches.FixCharacterLighting",
+      "target": "FakeCharacterGI",
+      "method": "OnRenderImage"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.VisualPatches.DisableUltimateBloom",
+      "target": "UltimateBloom",
+      "method": "OnRenderImage"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.VisualPatches.FixAimCulling",
+      "target": "EFT.CameraControl.CameraLodBiasController",
+      "method": "SetBiasByFov"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.VisualPatches.FixDistantShadows",
+      "target": "DistantShadow",
+      "method": "Awake"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.VisualPatches.FixThermalsDoubleVision",
+      "target": "ThermalVision",
+      "method": "Switch"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.VisualPatches.ReduceDamageBlur",
+      "target": "FastBlur",
+      "method": "Start"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.VisualPatches.SetDistantShadowSettings",
+      "target": "DistantShadow",
+      "method": "Awake"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.WeatherPatches.DisableClouds",
+      "target": "EFT.Rendering.Clouds.CloudLayerRenderer",
+      "method": "RenderClouds"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.WeatherPatches.FixTODCamera",
+      "target": "TOD_Camera",
+      "method": "Update"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.WeatherPatches.DisableMBOIT",
+      "target": "MBOIT_Scattering",
+      "method": "Start"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.WeatherPatches.FixTODScattering",
+      "target": "TOD_Scattering",
+      "method": "OnRenderImage"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.WeatherPatches.FixFogForVR",
+      "target": "PrismEffects",
+      "method": "SetFogShaderValues"
+    },
+    {
+      "patch": "TarkovVR.Patches.Visuals.WeatherPatches.DynamicFog",
+      "target": "EFT.Weather.WeatherController",
+      "method": "ControlScattering"
+    },
+    {
+      "patch": "TarkovVR.Patches.Upscalers.DLSSPatches.FixDLSSRender",
+      "target": "SSAAImpl",
+      "method": "TryRenderDLSS"
+    },
+    {
+      "patch": "TarkovVR.Patches.Upscalers.DLSSPatches.StereoDLSSOnDestroy",
+      "target": "SSAAImpl",
+      "method": "OnDestroy"
+    },
+    {
+      "patch": "TarkovVR.Patches.Upscalers.DLSSPatches.DisableResolutionCheckForDLSS",
+      "target": "EFT.Settings.Graphics.GraphicsSettingsGroup",
+      "method": "GetValidatedDLSSMode"
+    },
+    {
+      "patch": "TarkovVR.Patches.Upscalers.FSRPatches.FixFSR3Render",
+      "target": "SSAAImpl",
+      "method": "TryRenderFSR3"
+    },
+    {
+      "patch": "TarkovVR.Patches.Upscalers.FSRPatches.FixFSR2Render",
+      "target": "SSAAImpl",
+      "method": "TryRenderFSR2"
+    },
+    {
+      "patch": "TarkovVR.Patches.Upscalers.FSRPatches.FixEnableFSR3Setter",
+      "target": "SSAAImpl",
+      "method": "set_EnableFSR3"
+    },
+    {
+      "patch": "TarkovVR.Patches.Upscalers.FSRPatches.FixEnableFSR2Setter",
+      "target": "SSAAImpl",
+      "method": "set_EnableFSR2"
+    },
+    {
+      "patch": "TarkovVR.Patches.Upscalers.FSRPatches.StereoFSRSetAfterTransparentRT",
+      "target": "SSAAImpl",
+      "method": "SetAfterTransparentRT"
+    },
+    {
+      "patch": "TarkovVR.Patches.Upscalers.FSRPatches.StereoFSROnDestroy",
+      "target": "SSAAImpl",
+      "method": "OnDestroy"
+    },
+    {
+      "patch": "TarkovVR.Patches.Upscalers.FSRPatches.FSR3WrapperPatch",
+      "target": "FSR3Wrapper",
+      "method": "PrepareOutput"
+    },
+    {
+      "patch": "TarkovVR.Patches.Upscalers.FSRPatches.FixFSR3Box",
+      "target": "FSR3Wrapper",
+      "method": "Set_cbFSR3_Constants"
+    },
+    {
+      "patch": "TarkovVR.Patches.Upscalers.UpscalerQualityPatches.UpdateVREyeResolutionForDLSS",
+      "target": "EFT.CameraControl.CameraManager",
+      "method": "SetAntiAliasing"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.MouseInputBlockPatches.ForceNoMouseInput",
+      "target": "UnityEngine.EventSystems.StandaloneInputModule",
+      "method": "Process"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.SetGameUI",
+      "target": "EFT.UI.UsingPanel",
+      "method": "Init"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.InitQuickSlotRadialIcons",
+      "target": "EFT.Player/FirearmController",
+      "method": "InitBallisticCalculator"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.SetNotificationsUi",
+      "target": "EFT.UI.NotifierView",
+      "method": "Awake"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.DisableComponentThatBlocksText",
+      "target": "EFT.UI.BaseNotificationView",
+      "method": "Init"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.SetExtractionTimerAndPositionLeftWristUi",
+      "target": "EFT.UI.ExtractionTimersPanel",
+      "method": "Awake"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.HandleCloseInventoryPatch",
+      "target": "EFT.UI.InventoryScreen",
+      "method": "TranslateCommand"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.FixInventoryAfterRaid",
+      "target": "EFT.UI.ItemsPanel",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.DisableUiPointer",
+      "target": "EFT.UI.ActionPanel",
+      "method": "Start"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.CopyInteractionUi",
+      "target": "EFT.UI.ActionPanel",
+      "method": "CG_Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.PositionExtractPanel",
+      "target": "EFT.UI.BattleUIPanelExitTrigger",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.PositionTransitPanel",
+      "target": "EFT.UI.LocationTransitTimerPanel",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.PositionPlaceItemUI",
+      "target": "EFT.UI.BattleUIPanelExtraction",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.SetTransmitInteractionMenuActive",
+      "target": "EFT.UI.ActionPanel",
+      "method": "AvailableInteractionStateChangedHandler"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.TrackInteractionActionCount",
+      "target": "EFT.UI.ActionPanel",
+      "method": "AvailableInteractionStateChangedHandler"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.ShowTransitTransferMenu",
+      "target": "EFT.UI.TransferItemsInRaidScreen",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.HideTransitTransferMenu",
+      "target": "EFT.UI.TransferItemsInRaidScreen",
+      "method": "Close"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.HideQuickSlotBar",
+      "target": "EFT.UI.InventoryScreenQuickAccessPanel",
+      "method": "AnimatedShow"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.HideZeroingUI",
+      "target": "EFT.UI.EftBattleUIScreen/EftBattleUIScreenController",
+      "method": "ShowAmmoCountZeroingPanel"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.ReturnCommonUiToZeroRot",
+      "target": "EFT.UI.GridViewMagnifier",
+      "method": "CG_InitGridView"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.PositionInRaidInventory",
+      "target": "EFT.UI.TabGroup",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.PreventOffAxisGridItemsViews",
+      "target": "EFT.UI.DragAndDrop.GridView",
+      "method": "AddItemView"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.PreventOffAxisSlotItemsViews",
+      "target": "EFT.UI.DragAndDrop.SlotView",
+      "method": "CreateItemView"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.PreventOffAxisModSlotItemsViews",
+      "target": "EFT.UI.DragAndDrop.ModSlotView",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.PreventOffAxisSettingsTabText",
+      "target": "EFT.UI.UISpawnableToggle",
+      "method": "InitSpawnableButton"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.PreventOffAxisQuickSlotItemsViews",
+      "target": "EFT.UI.DragAndDrop.QuickSlotView",
+      "method": "SetItem"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.FixMagnifyWithRotationHandling",
+      "target": "EFT.UI.DragAndDrop.GridView",
+      "method": "MagnifyIfPossible"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.RestoreTransformAfterMagnify",
+      "target": "EFT.UI.DragAndDrop.GridView",
+      "method": "MagnifyIfPossible"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.Raycaster",
+      "target": "EFT.Player",
+      "method": "InteractionRaycast"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.DisableLootDistanceCheck",
+      "target": "EFT.InteractionContextHelper/CG_Class1750",
+      "method": "method_0"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.RerouteHeldItemTake",
+      "target": "EFT.InteractionContextHelper",
+      "method": "smethod_10"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.FixItemPlacement",
+      "target": "EFT.Player",
+      "method": "LateUpdate"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.PositionLoadRaidBannerToggles",
+      "target": "EFT.UI.Matchmaker.BannerPageToggle",
+      "method": "Init"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.SetLoadRaidPlayerViewCamFoV",
+      "target": "EFT.UI.Matchmaker.MatchMakerPlayerPreview",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.SuppressOpticZoomPanel",
+      "target": "EFT.UI.AnimatedTextPanel",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.SetAmmoCountUi",
+      "target": "EFT.UI.AnimatedTextPanel",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.SetAmmoCountUi",
+      "target": "EFT.UI.BattleUIScreen\u00602\u003CEFT.UI.EftBattleUIScreen/EftBattleUIScreenController,EFT.UI.Screens.EEftScreenType\u003E",
+      "method": "ShowAmmoDetails"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.SetFireModeUi",
+      "target": "EFT.UI.AmmoCountPanel",
+      "method": "ShowFireMode"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.HideFireModeUi",
+      "target": "EFT.UI.BattleUIComponentAnimation",
+      "method": "Hide"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.PositiionEquipItemWindow",
+      "target": "EFT.UI.EquipItemWindow",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.PositionToolTips",
+      "target": "EFT.UI.Tooltip",
+      "method": "SetPosition"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.ActivateTooltipHoverArea",
+      "target": "EFT.UI.Ragfair.OfferView",
+      "method": "AvailableOfferStatus"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.ResetZAxisOnFleaMarketTrades",
+      "target": "EFT.UI.Ragfair.OfferView",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.FixAcceptItem",
+      "target": "EFT.UI.DragAndDrop.GridView",
+      "method": "AcceptItem"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.FixCanAccept",
+      "target": "EFT.UI.DragAndDrop.GridView",
+      "method": "CanAccept"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.RepositionSplitWindow",
+      "target": "EFT.UI.SplitDialog",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.RepositionConsumablesWindow",
+      "target": "EFT.UI.SplitDialog",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.PlaceItemPositionUi",
+      "target": "EFT.Interactive.PlaceItemTrigger",
+      "method": "TriggerEnter"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.FixMapTilesAlwaysUnloading",
+      "target": "EFT.UI.PocketMapTile",
+      "method": "UnloadImage"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.FixMapTilesNotLoading",
+      "target": "EFT.UI.Map.SimplePocketMap",
+      "method": "BundleLoaded"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.RemoveQuickTip",
+      "target": "EFT.UI.Gestures.GesturesQuickPanel",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.BTROpenDialogUI",
+      "target": "EFT.UI.TraderDialogScreen",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.BTRCloseDialogUI",
+      "target": "EFT.UI.TraderDialogScreen",
+      "method": "Close"
+    },
+    {
+      "patch": "TarkovVR.Patches.UI.UIPatches.BlockInteractionMenuWhenHolding",
+      "target": "EFT.GamePlayerOwner",
+      "method": "InteractionsChangedHandler"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.PreventGunBlockInHideout",
+      "target": "EFT.HideoutPlayer",
+      "method": "SetPatrol"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.DisableHighlightMesh",
+      "target": "EFT.Hideout.HideoutController",
+      "method": "SetHighlight"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.PositionHideoutUiCamera",
+      "target": "EFT.Hideout.HideoutScreenRear",
+      "method": "Update"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.ReturnControlsOnInventoryBackButton",
+      "target": "EFT.UI.InventoryScreen",
+      "method": "CG_Awake"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.HandleHideoutOverlay",
+      "target": "EFT.Hideout.HideoutScreenOverlay",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.OnEnterHideout",
+      "target": "EFT.Hideout.HideoutScreenOverlay",
+      "method": "EnterHideoutMode"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.SetOriginalCamRotOnInvOpen",
+      "target": "EFT.UI.InventoryScreen",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.PositionInHideoutInventory",
+      "target": "EFT.UI.GridViewMagnifier",
+      "method": "CG_InitGridView"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.ReturnFromHideout",
+      "target": "EFT.Hideout.HideoutScreenOverlay",
+      "method": "ReturnToHomeScreen"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.RemoveOnExitTriggerFromLightSelection",
+      "target": "EFT.UI.HoverTrigger",
+      "method": "Init"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.ReturnFromHideoutThroughPreloader",
+      "target": "EFT.MainMenuShowOperation",
+      "method": "TryOpenMainMenu"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.SetInGameOnReturnToHideout_Preloader",
+      "target": "EFT.MainMenuShowOperation",
+      "method": "method_23"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.SetInGameOnReturnToHideout_Common",
+      "target": "EFT.UI.MenuScreen",
+      "method": "Click"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.SetInGameOnReturnToHideout_Common",
+      "target": "EFT.Hideout.HideoutLoadingScreen",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.GetItemContainerListPosition",
+      "target": "EFT.UI.ItemSelectionCell",
+      "method": "DropdownButtonClickHandler"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.PositionItemContainerList",
+      "target": "EFT.Hideout.SelectItemContextMenu",
+      "method": "SetContainerPosition"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.SetItemContainerListPos",
+      "target": "EFT.Hideout.SelectItemContextMenu",
+      "method": "GetItem"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.CloseUiOnDoubleClick",
+      "target": "EFT.UI.MenuTaskBar/CG_Awake",
+      "method": "method_0"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.HideoutPatches.PositionWeaponRackTransferWindow",
+      "target": "EFT.UI.DragAndDrop.TemplatedGridsView",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.FixMenuImagesScaling",
+      "target": "EFT.UI.PixelPerfectSpriteScaler",
+      "method": "UpdateScale"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.AddAndFixMenuVRCam",
+      "target": "EFT.MainMenuShowOperation",
+      "method": "Init"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.KeepLaserOnLoad",
+      "target": "EFT.UI.Matchmaker.MatchmakerTimeHasCome",
+      "method": "Update"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PositionMenuPropsAfterRefresh",
+      "target": "EFT.UI.EnvironmentUI",
+      "method": "RefreshEnvironmentAsync"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.FixDragHighlighting",
+      "target": "EFT.UI.DragAndDrop.GridView",
+      "method": "CalculateItemLocation"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PreventMenuOptionSelectCamRotation",
+      "target": "EFT.UI.EnvironmentUIRoot",
+      "method": "RandomRotate"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PreventMenuReturnCamRotatiown",
+      "target": "EFT.UI.EnvironmentUIRoot",
+      "method": "RotateBack"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.RepositionEnvironmentAfterChange",
+      "target": "EFT.UI.EnvironmentUIRoot",
+      "method": "Init"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.CloseContextMenu",
+      "target": "EFT.UI.SimpleContextMenu",
+      "method": "Update"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.FixContextMenuPositioning",
+      "target": "EFT.UI.SimpleContextMenu",
+      "method": "CorrectPosition"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.RotateInventoryItem",
+      "target": "EFT.UI.DragAndDrop.DraggedItemView",
+      "method": "UpdateRotation"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PreventMenuOptionSelectCamRotation",
+      "target": "EFT.UI.UIInputNode",
+      "method": "CorrectPosition"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.RepositionMessageWindow",
+      "target": "EFT.UI.ItemUiContext",
+      "method": "EditTag"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.DisableItemDisplayWindowStretchComponents",
+      "target": "EFT.UI.StretchArea",
+      "method": "Init"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.DisplayDialogWindow",
+      "target": "EFT.UI.DialogWindow\u00601\u003CEFT.UI.DialogWindowContext\u003E",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.DisplayDialogWindow",
+      "target": "EFT.UI.RepairWindow",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.FixWeaponPreviewCamera",
+      "target": "EFT.UI.WeaponModding.WeaponPreview",
+      "method": "CreateWeaponPreviewCamera"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.GetKeyPrefix",
+      "target": "UnityEngine.Input",
+      "method": "GetKey"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PositionTraderSeparatorBars",
+      "target": "EFT.UI.TraderScreensGroup",
+      "method": "Awake"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PositionDraggedItemIcon",
+      "target": "EFT.UI.DragAndDrop.DraggedItemView",
+      "method": "OnDrag"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.AddBoxColliderToSlotComponents",
+      "target": "EFT.UI.DragAndDrop.SlotView",
+      "method": "Start"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.HideTraderAutoFillHover",
+      "target": "EFT.UI.HoverTooltipArea",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.ApplyItemDetailWindowViewerRotate",
+      "target": "EFT.UI.ItemInfoWindowLabels",
+      "method": "Rotate"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.FixItemDetailWindowDrag",
+      "target": "EFT.UI.UIDragComponent",
+      "method": "UnityEngine.EventSystems.IDragHandler.OnDrag"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.WidenScrollbars",
+      "target": "EFT.UI.ScrollRectNoDrag",
+      "method": "OnEnable"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PositionItemDisplayWindow",
+      "target": "EFT.UI.InfoWindow",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.FixDragAndDropButton",
+      "target": "EFT.UI.DragAndDrop.ItemView",
+      "method": "Update"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PositionHeadVoiceDropdownMenus",
+      "target": "EFT.UI.BaseDropDownBox",
+      "method": "ToggleMenu"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PositionLoginPlayerModelPreview",
+      "target": "EFT.UI.PlayerProfilePreview",
+      "method": "ChangeCameraPosition"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PositionRaidPlayerModelPreview",
+      "target": "EFT.UI.PlayerModelView",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.OpenVRKeyboard",
+      "target": "TMPro.TMP_InputField",
+      "method": "OnPointerClick"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PositionOfferWindow",
+      "target": "EFT.UI.Ragfair.AddOfferWindow",
+      "method": "OnNodePriceUpdatedHandler"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.UndoRotationOnTransferItems",
+      "target": "EFT.UI.TransferItemsScreen",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PositionFleaMarketFilterWindow",
+      "target": "EFT.UI.Ragfair.RagfairFilterWindow",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PositionItemDisplayWindow",
+      "target": "EFT.UI.GridWindow",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PositionSomeWindow",
+      "target": "EFT.UI.Window\u00601\u003CEFT.UI.WindowContext\u003E",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PositionLoginWelcomeScreen",
+      "target": "EFT.UI.WelcomeScreen\u00602\u003CEFT.UI.EftWelcomeScreen/EftWelcomeScreenController,EFT.UI.Screens.EEftScreenType\u003E",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PositionLoginWelcomeScreen",
+      "target": "EFT.UI.AccountSideSelectionScreen\u00602\u003CEFT.UI.EftAccountSideSelectionScreen/EftAccountSideSelectionScreenController,EFT.UI.Screens.EEftScreenType\u003E",
+      "method": "Awake"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PositionInRaidMenu",
+      "target": "EFT.UI.MenuScreen/RaidMainMenuScreenController",
+      "method": "ShowAction"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.CloseOverlayWindows",
+      "target": "EFT.UI.Screens.ScreenManager\u00601/ScreenController\u00602\u003CEFT.UI.Screens.EEftScreenType,EFT.UI.MenuScreen/MainMenuBaseScreenController,EFT.UI.MenuScreen\u003E",
+      "method": "CloseScreen"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.CloseSettingsInGame",
+      "target": "EFT.UI.Settings.SettingsScreen",
+      "method": "Close"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.FixWeapCharactericsPanel",
+      "target": "EFT.UI.CharacteristicsPanel",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.FixWeapCharactericsPanelOnClose",
+      "target": "EFT.UI.CharacteristicsPanel",
+      "method": "Close"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.FixWeapCharactericsPanelOnClick",
+      "target": "EFT.UI.CharacteristicsPanel",
+      "method": "SetState"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.FixWeaponModdingDropDownPosition",
+      "target": "EFT.UI.WeaponModding.DropDownMenu",
+      "method": "UpdatePosition"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.ActivateWeaponModdingDropDown",
+      "target": "EFT.UI.WeaponModding.ModdingScreenSlotView",
+      "method": "Start"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PreventHidingDropDownMethod1",
+      "target": "EFT.UI.WeaponModding.ModdingScreenSlotView",
+      "method": "HoverEndHandler"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PreventHidingDropDownMethod5",
+      "target": "EFT.UI.WeaponModding.ModdingScreenSlotView",
+      "method": "MenuOpenHandler"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PreventHidingDropDownCheckVisibility",
+      "target": "EFT.UI.WeaponModding.ModdingScreenSlotView",
+      "method": "CheckVisibility"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.AttachVRLineSync",
+      "target": "EFT.UI.WeaponModding.ModdingScreenSlotView",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PositionWeaponPreviewEditBuild",
+      "target": "EFT.UI.EditBuildScreen",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PositionWeaponPreviewModding",
+      "target": "EFT.UI.WeaponModding.WeaponModdingScreen",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.HookViewporterDragForVR",
+      "target": "EFT.UI.CameraViewporter",
+      "method": "OnEnable"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.ScaleBoneIconsForVR",
+      "target": "EFT.UI.CameraViewporter",
+      "method": "WorldToLocalScreenPosition"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.SetUiOnExtractOrDeath",
+      "target": "EFT.BaseLocalGame\u00601/CG_Class1637\u003CEFT.EftGamePlayerOwner\u003E",
+      "method": "method_0"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.SetUiOnExtractOrDeathOther",
+      "target": "EFT.BaseLocalGame\u00601/CG_Class1637\u003CEFT.EftGamePlayerOwner\u003E",
+      "method": "method_0"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.SetSessionEndUI",
+      "target": "EFT.UI.SessionEnd.SessionEndUI",
+      "method": "Awake"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.ResetRotOnScavInvScreen",
+      "target": "EFT.UI.ScavengerInventoryScreen",
+      "method": "UpdateSellAllButton"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.ResetOfferImageRotation",
+      "target": "EFT.UI.DragAndDrop.RagfairOfferItemView",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.ResetRotationOnInvIcons",
+      "target": "EFT.UI.DragAndDrop.GridItemView",
+      "method": "OnRefreshItem"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.FixMenuPropsPositioning",
+      "target": "EFT.UI.ScreenPositionAnchor",
+      "method": "Update"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.SetVRSettings",
+      "target": "EFT.UI.Settings.SettingsScreen",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.CloseVRSettings",
+      "target": "EFT.UI.Settings.SettingsScreen",
+      "method": "ShowScreen"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.SaveVRSettings",
+      "target": "EFT.UI.Settings.SettingsScreen",
+      "method": "SaveButtonAction"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.SaveVRSettings",
+      "target": "UnityEngine.UI.ToggleGroup",
+      "method": "NotifyToggleOn"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.SaveVRSettings",
+      "target": "EFT.UI.Matchmaker.RaidSettingsWindow",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.HideDefaultTaskDesc",
+      "target": "EFT.UI.TasksPanel",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.ShowBuildWindowWeaponSelector",
+      "target": "EFT.UI.OpenBuildWindow",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.ShowBuildWindowSave",
+      "target": "EFT.UI.Builds.EditBuildNameWindow",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.FixOverallScreenPlayerSize",
+      "target": "EFT.UI.OverallScreen",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.FixAchievementsScreenPlayerSize",
+      "target": "EFT.UI.AchievementsScreen",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.FixInsuranceWindowPosition",
+      "target": "EFT.UI.Insurance.InsuranceWindow",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Misc.MenuPatches.PositionMenuAfterTransit",
+      "target": "EFT.UI.Matchmaker.MatchmakerTimeHasCome",
+      "method": "Show"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.VR.InitVRPatches.AddVR",
+      "target": "CharacterControllerSpawner",
+      "method": "Spawn"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.VR.InitVRPatches.DisableLaser",
+      "target": "EFT.UI.PreloaderUI",
+      "method": "ShowRaidStartInfo"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.VR.InitVRPatches.SetMainCamParent",
+      "target": "BloodOnScreen",
+      "method": "Start"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.VR.InitVRPatches.SetupIK",
+      "target": "RootMotion.FinalIK.SolverManager",
+      "method": "OnDisable"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.VR.InitVRPatches.SetRigAndSidearmHolsters",
+      "target": "EFT.Animations.PlayerSpring",
+      "method": "Start"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.VR.VRControlsPatches.MasterVRControls",
+      "target": "EFT.InputSystem.InputPreset",
+      "method": "UpdateInput"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.VR.VRGrenadeController.HandleGrenade",
+      "target": "EFT.Player/GrenadeHandsController",
+      "method": "Spawn"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.VR.VRGrenadeController.CheckGrenadeAnimation",
+      "target": "EFT.Player",
+      "method": "LateUpdate"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.VR.VRGrenadeController.RepositionGrenadeThrow",
+      "target": "EFT.Player/BaseGrenadeHandsController",
+      "method": "ThrowGrenadeInner"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.VR.VRGrenadeController.DisableGrenadeStuffAfterCancel",
+      "target": "EFT.Player/BaseGrenadeHandsController",
+      "method": "IEventsConsumerOnWeapOut"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.VR.VRMeleeController.ManageKnifeCollider",
+      "target": "EFT.Player",
+      "method": "LateUpdate"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.EatingPatches.OnSpawnPre",
+      "target": "EFT.Player/MedsController",
+      "method": "Spawn"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.EatingPatches.OnSpawnPost",
+      "target": "EFT.Player/MedsController",
+      "method": "Spawn"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.EatingPatches.GateEffect",
+      "target": "EFT.Player/MedsController/MedsInHandsOperation",
+      "method": "GoNextBodyPart"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.EatingPatches.OnUpdate",
+      "target": "EFT.Player/MedsController",
+      "method": "ManualUpdate"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.EatingPatches.OnThirdAction",
+      "target": "EFT.Player/MedsController",
+      "method": "IEventsConsumerOnThirdAction"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.EatingPatches.OnWeapOut",
+      "target": "EFT.Player/MedsController",
+      "method": "IEventsConsumerOnWeapOut"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.EatingPatches.OnDestroy",
+      "target": "EFT.Player/MedsController",
+      "method": "Destroy"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.EatingPatches.LateZeroProps",
+      "target": "EFT.Player",
+      "method": "LateUpdate"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.EatingPatches.OnSoundGate",
+      "target": "BaseSoundPlayer",
+      "method": "IEventsConsumer.OnSound"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.EatingPatches.ForceHeadLockedEatAudio",
+      "target": "BaseSoundPlayer",
+      "method": "PlayClip"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.EatingPatches.AudioToHaptics",
+      "target": "BaseSoundPlayer",
+      "method": "PlayClip"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.EatingPatches.ForceLeftHandTracking",
+      "target": "TarkovVR.Source.Player.VRManager.VRPlayerManager",
+      "method": "UpdateLeftHand"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.EatingReconPatches.ReconSpawn",
+      "target": "EFT.Player/MedsController",
+      "method": "Spawn"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.EatingReconPatches.ReconSound",
+      "target": "BaseSoundPlayer",
+      "method": "IEventsConsumer.OnSound"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.EatingReconPatches.ReconTick",
+      "target": "EFT.Player",
+      "method": "LateUpdate"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.IKPatches.DisableYAxisSmoothing",
+      "target": "EFT.Player",
+      "method": "HeightInterpolation"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.IKPatches.InstantBodyPoseLevel",
+      "target": "EFT.MovementContext",
+      "method": "SmoothPoseLevel"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.IKPatches.DisableGunShift",
+      "target": "EFT.Animations.ProceduralWeaponAnimation",
+      "method": "CheckShouldMoveWeaponCloser"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.IKPatches.DisableWalkEffector",
+      "target": "WalkEffector",
+      "method": "Process"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.IKPatches.OverrideShoulders",
+      "target": "PlayerBones",
+      "method": "SetShoulders"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.IKPatches.FixLeftArmBendGoal",
+      "target": "EFT.Player",
+      "method": "UpdateBonesOnWeaponChange"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.IKPatches.SetBodyIKScale",
+      "target": "EFT.Player",
+      "method": "SetCompensationScale"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.IKPatches.RemoveSprintAnimFromHands",
+      "target": "EFT.Player",
+      "method": "IkProcess"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.IKPatches.DisableLayer1DuringSprint",
+      "target": "EFT.PlayerAnimator",
+      "method": "EnableSprint"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.IKPatches.ReemoveSprintAnimFromHands",
+      "target": "AnimationSystem.UnityAnimatorWrapper",
+      "method": "SetAnimator"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.MeshPatches.LoadNoArmsModel",
+      "target": "EFT.PlayerBody",
+      "method": "UpdatePlayerRenders"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.MovementPatches.SetPlayerRotate",
+      "target": "EFT.MovementContext",
+      "method": "InitComponents"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.MovementPatches.SetPlayerRotateOnTransition2Stand",
+      "target": "Prone2StandState",
+      "method": "Exit"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.MovementPatches.SetPlayerRotateOnTransition2Prone",
+      "target": "Transit2ProneState",
+      "method": "Enter"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.MovementPatches.SetPlayerRotate",
+      "target": "EFT.MovementState",
+      "method": "Rotate"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.MovementPatches.SetPlayerRotateOnProneStationary",
+      "target": "EFT.PronePlayerState",
+      "method": "Rotate"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.MovementPatches.SetPlayerRotateOnProneMoving",
+      "target": "EFT.ProneMovePlayerState",
+      "method": "Rotate"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.MovementPatches.FixBodyRotation",
+      "target": "EFT.MovementState",
+      "method": "ProcessUpperbodyRotation"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.MovementPatches.PositionCamera",
+      "target": "EFT.CameraControl.FirstPersonCameraState",
+      "method": "ManualLateUpdate"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.UnlockHand",
+      "target": "EFT.Player/FirearmController/AutomaticFireOperation",
+      "method": "SwitchToMalfunction"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.RemoveGunTilt",
+      "target": "MotionEffector",
+      "method": "Process"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.ResetWeaponOnEquipHands",
+      "target": "EFT.Player/EmptyHandsController",
+      "method": "Spawn"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.ResetIKOnExitHands",
+      "target": "EFT.Player/EmptyHandsController",
+      "method": "Drop"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.SetRangeFinder",
+      "target": "EFT.Player/UsableItemController",
+      "method": "IEventsConsumerOnWeapIn"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.UnequipRangeFinder",
+      "target": "EFT.PortableRangeFinderController",
+      "method": "CG_GetOperationFactoryDelegates1"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.FixCompassToLeftHand",
+      "target": "EFT.Player",
+      "method": "PropUpdate"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.SetCompassEquippedFirearm",
+      "target": "EFT.Player/FirearmController",
+      "method": "SetCompassState"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.SetCompassEquippedGrenade",
+      "target": "EFT.Player/GrenadeHandsController",
+      "method": "SetCompassState"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.ReturnWeaponToOriginalParentOnChange",
+      "target": "EFT.Player/FirearmController",
+      "method": "IEventsConsumerOnWeapOut"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.CheckQueue",
+      "target": "AnimationEventSystem.AnimationEventsEmitter",
+      "method": "EmitEvents"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.FinishMovingWeaponToVrHands",
+      "target": "EFT.Player/FirearmController",
+      "method": "IEventsConsumerOnWeapIn"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.MoveKnifeToIKHands",
+      "target": "EFT.Player/KnifeController",
+      "method": "Spawn"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.UnequipVrKnife",
+      "target": "EFT.Player/KnifeController",
+      "method": "method_9"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.AddNewMagToInteractionController",
+      "target": "EFT.Player/FirearmController",
+      "method": "method_49"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.AlignHeadsetReticle",
+      "target": "EFT.CameraControl.OpticRetrice",
+      "method": "UpdateTransform"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.AddNewTacDeviceToInteractionController",
+      "target": "EFT.Player/FirearmController",
+      "method": "method_46"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.BlockHighLightMeshUpdate",
+      "target": "HighLightMesh",
+      "method": "Update"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.HandleHighLightMeshAwake",
+      "target": "HighLightMesh",
+      "method": "Awake"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.UnregisterHighLightOnBeforeRender",
+      "target": "HighLightMesh",
+      "method": "OnDestroy"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.CleanupHighlightMesh",
+      "target": "EFT.Player/FirearmController",
+      "method": "InitBallisticCalculator"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.MoveWeaponToIKHands",
+      "target": "EFT.Player/FirearmController",
+      "method": "InitBallisticCalculator"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.ScaleOpticResolution",
+      "target": "EFT.CameraControl.OpticCameraManager",
+      "method": "SetResolution"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.SetupOpticReticleDecouple",
+      "target": "EFT.CameraControl.OpticCameraManager",
+      "method": "SetResolution"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.SuppressLowResReticle",
+      "target": "EFT.CameraControl.OpticRetrice",
+      "method": "OnPreCull"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.ApplyHeadsetOpticLimits",
+      "target": "EFT.CameraControl.OpticComponentUpdater",
+      "method": "LateUpdate"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.WaitForVROpticController",
+      "target": "EFT.CameraControl.OpticComponentUpdater",
+      "method": "CopyComponentFromOptic"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.SetOpticCamFoV",
+      "target": "EFT.CameraControl.OpticComponentUpdater",
+      "method": "CopyComponentFromOptic"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.PreventUsingStationaryWeapon",
+      "target": "EFT.InteractionContextHelper/CG_Class1750",
+      "method": "method_0"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.DisableCoroutineWhenHeldItem",
+      "target": "EFT.Interactive.LootItem",
+      "method": "StartPhysics"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.PreventStopPhysicsOnHeldItem",
+      "target": "EFT.Interactive.LootItem",
+      "method": "StopPhysics"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.AddHeldItemWeight",
+      "target": "PhysicalBase/PlayerBridge",
+      "method": "get_TotalWeight"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.FixWeightAfterOnWeightUpdated",
+      "target": "Physical",
+      "method": "OnWeightUpdated"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.ForceWeightRecalcWhileHoldingItem",
+      "target": "PhysicalBase",
+      "method": "LateUpdate"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.CleanupHighlightMeshMeds",
+      "target": "EFT.Player/MedsController",
+      "method": "Spawn"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.SpawnMedsController",
+      "target": "EFT.Player/MedsController",
+      "method": "Spawn"
+    },
+    {
+      "patch": "TarkovVR.Patches.Core.Player.WeaponPatches.FixCollimatorParallaxEffect",
+      "target": "CollimatorSight",
+      "method": "OnEnable"
+    },
+    {
+      "patch": "TarkovVR.ModSupport.WeaponCustomizer.WeaponCustomizerSupport.BeginDragPrefix",
+      "target": "WeaponCustomizer.DraggableBone",
+      "method": "OnBeginDrag"
+    },
+    {
+      "patch": "TarkovVR.ModSupport.WeaponCustomizer.WeaponCustomizerSupport.DragPrefix",
+      "target": "WeaponCustomizer.DraggableBone",
+      "method": "OnDrag"
+    },
+    {
+      "patch": "TarkovVR.ModSupport.WeaponCustomizer.WeaponCustomizerSupport.EndDragPostfix",
+      "target": "WeaponCustomizer.DraggableBone",
+      "method": "OnEndDrag"
+    },
+    {
+      "patch": "TarkovVR.ModSupport.EFTApi.EFTApiSupport.SetEFTConfigWindow",
+      "target": "KmyTarkovConfiguration.Views.EFTConfigurationView",
+      "method": "CreateUI"
+    },
+    {
+      "patch": "TarkovVR.ModSupport.EFTApi.EFTApiSupport.HandleDragging",
+      "target": "KmyTarkovConfiguration.Views.Drag",
+      "method": "OnDrag"
+    },
+    {
+      "patch": "TarkovVR.ModSupport.DynamicMaps.DynamicMapsSupport.SetMapViewWorldCamera",
+      "target": "DynamicMaps.UI.Components.MapView",
+      "method": "LoadMap"
+    },
+    {
+      "patch": "TarkovVR.ModSupport.DynamicMaps.DynamicMapsSupport.DisableMinimap",
+      "target": "DynamicMaps.UI.Components.MapPeekComponent",
+      "method": "HandleMinimapState"
+    },
+    {
+      "patch": "TarkovVR.ModSupport.DynamicMaps.DynamicMapsSupport.FixMapPositionInRaid",
+      "target": "DynamicMaps.UI.ModdedMapScreen",
+      "method": "OnShowInRaid"
+    },
+    {
+      "patch": "TarkovVR.ModSupport.DynamicMaps.DynamicMapsSupport.FixMapLabelScale",
+      "target": "DynamicMaps.UI.Components.MapLabel",
+      "method": "Create"
+    },
+    {
+      "patch": "TarkovVR.ModSupport.DynamicMaps.DynamicMapsSupport.FixMarkerLabelScale",
+      "target": "DynamicMaps.UI.Components.MapMarker",
+      "method": "Create"
+    },
+    {
+      "patch": "TarkovVR.ModSupport.DynamicMaps.DynamicMapsSupport.VRCursorUpdate",
+      "target": "DynamicMaps.UI.Controls.CursorPositionText",
+      "method": "Update"
+    },
+    {
+      "patch": "TarkovVR.ModSupport.DynamicMaps.DynamicMapsSupport.FixTextureResolution",
+      "target": "DynamicMaps.Utils.TextureUtils",
+      "method": "LoadTexture2DFromPath"
+    },
+    {
+      "patch": "TarkovVR.ModSupport.DynamicMaps.DynamicMapsSupport.SuppressReadConfigError",
+      "target": "DynamicMaps.UI.ModdedMapScreen",
+      "method": "ReadConfig"
+    },
+    {
+      "patch": "TarkovVR.ModSupport.AmandsGraphics.AmandsGraphicsSupport.BlockOpticDepthOfFieldClass",
+      "target": "AmandsGraphics.AmandsGraphicsClass",
+      "method": "ActivateAmandsOpticDepthOfField"
+    },
+    {
+      "patch": "TarkovVR.ModSupport.AmandsGraphics.AmandsGraphicsSupport.BlockOpticSightPatch",
+      "target": "AmandsGraphics.AmandsGraphicsOpticSightPatch",
+      "method": "PatchPostFix"
+    },
+    {
+      "patch": "TarkovVR.ModSupport.AmandsGraphics.AmandsGraphicsSupport.BlockOpticPatch",
+      "target": "AmandsGraphics.AmandsGraphicsOpticPatch",
+      "method": "PatchPostFix"
+    },
+    {
+      "patch": "TarkovVR.ModSupport.AmandsGraphics.AmandsGraphicsSupport.BlockSomeOtherOpticPatch",
+      "target": "AmandsGraphics.AmandsGraphicsmethod_25Patch",
+      "method": "PatchPostFix"
+    }
+  ],
+  "failures": []
+}

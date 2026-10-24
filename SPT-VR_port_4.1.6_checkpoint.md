@@ -1,3 +1,17 @@
+# Aktuální stav portu SPT-VR na 4.1.6
+
+Aktualizováno 24. 10. 2026. Zdrojový projekt je obnovený z cybensis/SPT-VR a převedený v tomto repozitáři, `src/SPT-VR`, ve větvi `codex/port-spt-4.1.6`.
+
+Release `1.3.0.416` se sestavuje bez chyb. Kontrola kompatibility ověřila všech 293 Harmony patchů bez selhání. Testovací DLL a kompletní ZIP jsou v `artifacts/`. FIKA je vynechaná. PIP update/target zůstává nativní a VR zoom i reticle úpravy jsou zachované.
+
+Podrobnosti: `README.md`, `VALIDATION.md`, `TESTING.md`. Build: `bash scripts/build.sh`. Další krok je ruční test ve Windows se SPT 4.1.6 a SteamVR/headsetem; herní funkčnost zde zatím ověřená není.
+
+---
+
+# Archiv původního checkpointu před aktuálním portem
+
+Následující poznámky popisují starší, nedostupnou pracovní kopii. Uvedené chybové počty a poznámka o chybějícím zdrojovém projektu jsou historické a aktuální stav výše je nahrazuje.
+
 # SPT-VR port to SPT 4.1.6 — project checkpoint
 
 ## Goal
