@@ -39,7 +39,9 @@ var resolver = new DefaultAssemblyResolver();
 resolver.AddSearchDirectory(Path.GetDirectoryName(Path.GetFullPath(args[0]))!);
 foreach (var directory in args.Skip(1)) resolver.AddSearchDirectory(directory);
 var packages = Environment.GetEnvironmentVariable("NUGET_PACKAGES") ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),".nuget","packages");
-if (Directory.Exists(Path.Combine(packages,"harmonyx"))) foreach (var dll in Directory.GetFiles(Path.Combine(packages,"harmonyx"),"0Harmony.dll",SearchOption.AllDirectories)) resolver.AddSearchDirectory(Path.GetDirectoryName(dll)!);
+foreach(var (package,filename) in new[]{("harmonyx","0Harmony.dll"),("bepinex.baselib","BepInEx.dll")}) {
+    if (Directory.Exists(Path.Combine(packages,package))) foreach (var dll in Directory.GetFiles(Path.Combine(packages,package),filename,SearchOption.AllDirectories)) resolver.AddSearchDirectory(Path.GetDirectoryName(dll)!);
+}
 using var mod = AssemblyDefinition.ReadAssembly(args[0], new ReaderParameters {AssemblyResolver=resolver});
 foreach (var type in Flatten(mod.MainModule.Types)) types.TryAdd(type.FullName,type);
 int bound = 0, dynamicCount = 0;
@@ -101,6 +103,14 @@ if(mod.MainModule.AssemblyReferences.Any(r => r.Name.Contains("Fika",StringCompa
 var plugin = mod.MainModule.Types.Single(t=>t.FullName=="TarkovVR.Plugin");
 var pluginInfo = plugin.CustomAttributes.Single(a=>a.AttributeType.Name=="BepInPlugin");
 if((string)pluginInfo.ConstructorArguments[2].Value!=mod.Name.Version.ToString()) failures.Add(new{problem="Plugin and assembly versions disagree",plugin=pluginInfo.ConstructorArguments[2].Value,assembly=mod.Name.Version.ToString()});
+foreach(var dependency in new[]{"com.SPT.core","com.SPT.singleplayer"}) {
+    if(!plugin.CustomAttributes.Any(a=>a.AttributeType.Name=="BepInDependency" && (string)a.ConstructorArguments[0].Value==dependency)) failures.Add(new{problem="SPT must load before VR initialization",dependency});
+}
+var startupCalls=plugin.Methods.Single(m=>m.Name=="Awake").Body.Instructions.Where(i=>i.Operand is MethodReference).Select(i=>(MethodReference)i.Operand).ToList();
+var jsonStartup=startupCalls.FindIndex(m=>m.DeclaringType.FullName=="TarkovVR.Source.Compatibility.GameJsonBootstrap" && m.Name=="Initialize");
+var vrStartup=startupCalls.FindIndex(m=>m.DeclaringType.FullName==plugin.FullName && m.Name=="InitializeVR");
+if(jsonStartup<0 || vrStartup<0 || jsonStartup>=vrStartup) failures.Add(new{problem="Game JSON defaults must be initialized and checked before XR"});
+if(!types.TryGetValue("Newtonsoft.Json.UnityConverters.UnityConverterInitializer",out var jsonInitializer) || !jsonInitializer.Methods.Any(m=>m.Name=="Init" && m.IsStatic && m.Parameters.Count==0)) failures.Add(new{problem="Native Unity JSON initializer is unavailable"});
 var weapon = mod.MainModule.Types.First(t=>t.FullName=="TarkovVR.Patches.Core.Player.WeaponPatches");
 foreach(var name in new[]{"AlignHeadsetReticle","ApplyHeadsetOpticLimits"}) {
     var method=weapon.Methods.FirstOrDefault(m=>m.Name==name);

@@ -1,0 +1,4 @@
+JSON defaults verified: native item counts and string raid-side values are working.
+JSON defaults repaired: native item counts and string raid-side values are working.
+JSON defaults repaired: native item counts and string raid-side values are working.
+JSON regression: 92 assertions passed using supplied SPT 4.1.6 assemblies.

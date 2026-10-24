@@ -15,10 +15,13 @@ using static TarkovVR.Patches.Visuals.VisualPatches;
 using UnityEngine.XR;
 using System.Text;
 using TarkovVR.Source.Settings;
+using TarkovVR.Source.Compatibility;
 
 namespace TarkovVR
 {
-    [BepInPlugin("com.matsix.sptvr", "matsix-sptvr", "1.3.0.416")]
+    [BepInPlugin("com.matsix.sptvr", "matsix-sptvr", "1.3.1.416")]
+    [BepInDependency("com.SPT.core")]
+    [BepInDependency("com.SPT.singleplayer")]
     public class Plugin : BaseUnityPlugin
     {
         public static ManualLogSource MyLog;
@@ -29,6 +32,15 @@ namespace TarkovVR
         {
             Logger.LogInfo($"Plugin SPT-VR is loading!");
             MyLog = Logger;
+            try
+            {
+                Logger.LogInfo(GameJsonBootstrap.Initialize());
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"Game JSON initialization failed before VR startup: {ex}");
+                return;
+            }
             if (!InitializeVR())
             {
                 Logger.LogError("VR initialization failed. Skipping the rest of the plugin setup.");

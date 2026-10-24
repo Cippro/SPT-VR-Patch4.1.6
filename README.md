@@ -10,6 +10,8 @@ Testovací port pro single player z [cybensis/SPT-VR](https://github.com/cybensi
 
 Balíčky jsou ve složce `releases/4.1.6-test`, včetně SHA256 součtů a přehledu kompatibility.
 
+Aktuální oprava **1.3.1.416** řeší chybějící výchozí JSON převodníky, které způsobovaly chyby `StackObjectsCount` a nesprávný číselný formát `Side` v požadavku na raid. Inicializuje nativní Unity převodníky před XR a ověří načtení počtu i textový formát strany. Zachovává existující nastavení serializace; případně doplní pouze dva potřebné převodníky. Pokud už máte předchozí testovací ZIP, aktualizujte jen DLL podle [TESTING.md](TESTING.md). Oprava ještě vyžaduje opakovaný test ve hře.
+
 ## Stav a optika
 
 Kód se sestavuje proti dodaným knihovnám 4.1.6 pro `netstandard2.1`. Metadata test ověřuje všech 293 Harmony patchů: cíle, overloady, parametry a injektovaná pole. Ověřuje také absenci FIKA závislostí, zachování nativních aktualizací PIP/retiklu a ukládání zoomu do `SightComponent.ScopeZoomValue`.
@@ -26,7 +28,9 @@ V připraveném cloudovém prostředí spusťte:
 bash scripts/build.sh
 ```
 
-Skript obnoví zamčené závislosti, sestaví Release, ověří kompatibilitu a vytvoří `artifacts/SPT-VR.dll`, `artifacts/SPT-VR-4.1.6-test.zip` a jejich SHA256 součty. ZIP vychází z původního balíčku 1.3.0 s novou DLL a bez FIKA. Referenční knihovny hry se do balíčku nepřidávají.
+Skript obnoví zamčené závislosti, sestaví Release, ověří kompatibilitu a spustí regresní test JSON nad dodanými herními assembly. Test nejprve reprodukuje původní chyby a pak ověří stacky, stav předmětů, požadavky PMC/Scav a zachování existujících nastavení serializace. Vytvoří `artifacts/SPT-VR.dll`, `artifacts/SPT-VR-4.1.6-test.zip`, jejich SHA256 součty a `artifacts/json-regression.log`. ZIP vychází z původního balíčku 1.3.0 s novou DLL a bez FIKA. Referenční knihovny hry se do balíčku nepřidávají.
+
+V cloudu JSON test používá původní nepřepsané Managed 4.1.6. Na jiném počítači lze jejich kořen zadat přes `SPT_VR_RAW_REFERENCES`; bez něj použije stejné reference jako sestavení.
 
 Používá .NET SDK 8.0.426 a připravené publicized kopie knihoven 4.1.6 mimo checkout. Původní Managed 4.0.13 zůstává mimo checkout pro porovnávání a sestavení nezměněného upstreamu.
 
